@@ -36,10 +36,20 @@ public class Workspace implements Runnable{
 	 * @throws WorkspaceInputException
 	 */
 	private void initialCheck(String input) throws WorkspaceInputException {
+		// Get rid of spaces
+		input = input.replace(" ", "");
+		
 		// Check to see if opening parenthesis count is same as closing
 		int opening = input.length() - input.replace("(", "").length();
 		int closing = input.length() - input.replace(")", "").length();
 		if(opening != closing) throw new WorkspaceInputException("Number of '(' does not equal number of ')'.");
+		
+		// Check to see if starting/ending characters are invalid parenthesis
+		if(input.charAt(0) == ')' || input.charAt(input.length() - 1) == '(') throw new WorkspaceInputException("Invalid parenthesis placement (start/end).");
+		
+		// Check to make sure all parenthesis are followed by valid characters
+		
+		
 	}
 	
 	private void evaluate(String input){
