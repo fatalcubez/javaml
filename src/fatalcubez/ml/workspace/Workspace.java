@@ -45,7 +45,7 @@ public class Workspace implements Runnable{
 		if(opening != closing) throw new WorkspaceInputException("Number of '(' does not equal number of ')'.");
 		
 		// Check to see if starting/ending characters are invalid parenthesis
-		if(input.charAt(0) == ')' || input.charAt(input.length() - 1) == '(') throw new WorkspaceInputException("Invalid parenthesis placement (start/end).");
+		if(input.charAt(0) == ')' || input.charAt(input.length() - 1) == '(') throw new WorkspaceInputException("Invalid parentheses placement (start/end).");
 		
 		// Check to make sure all parenthesis are followed by valid characters
 		
