@@ -5,24 +5,41 @@ import java.util.Scanner;
 
 public class Workspace implements Runnable{
 
-	private Thread workspaceThread;
 	private WorkspaceFormatter formatter;
 	private Scanner scanner;
 	private boolean listening;
+	private Thread thread;
 	
 	public Workspace(InputStream in){
 		scanner = new Scanner(in);
 		formatter = new WorkspaceFormatter();
-		workspaceThread = new Thread(this);
 		startListening();
 	}
 
 	public void startListening(){
-		listening = true;
+		if(thread == null){
+			listening = true;
+			thread = new Thread(this);
+			thread.start();
+			System.out.print(">> ");
+		}
 	}
 	
 	public void stopListening(){
 		listening = false;
+	}
+	
+	/**
+	 * Takes workspace input and does initial checks on it for immediate errors in the input.
+	 * 
+	 * @param input
+	 * @throws WorkspaceInputException
+	 */
+	private void initialCheck(String input) throws WorkspaceInputException {
+		// Check to see if opening parenthesis count is same as closing
+		int opening = input.length() - input.replace("(", "").length();
+		int closing = input.length() - input.replace(")", "").length();
+		if(opening != closing) throw new WorkspaceInputException("Number of '(' does not equal number of ')'.");
 	}
 	
 	private void evaluate(String input){
@@ -32,7 +49,18 @@ public class Workspace implements Runnable{
 	@Override
 	public void run() {
 		while(scanner.hasNext() && listening){
-			evaluate(scanner.nextLine());
+			
+			String input = scanner.nextLine();
+			try{
+				initialCheck(input);
+			}catch(WorkspaceInputException e){
+				String formattedOutput = formatter.formatError(input, e);
+				System.out.println(formattedOutput);
+				System.out.print(">> ");
+				continue;
+			}
+			evaluate(input);
+			System.out.print(">> ");
 		}
 		scanner.close();
 	}
