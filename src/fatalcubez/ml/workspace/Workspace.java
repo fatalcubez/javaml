@@ -2,6 +2,8 @@ package fatalcubez.ml.workspace;
 
 import java.io.InputStream;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Workspace implements Runnable{
 
@@ -35,7 +37,7 @@ public class Workspace implements Runnable{
 	 * @param input
 	 * @throws WorkspaceInputException
 	 */
-	private void initialCheck(String input) throws WorkspaceInputException {
+	private void checkParentheses(String input) throws WorkspaceInputException {
 		// Get rid of spaces
 		input = input.replace(" ", "");
 		
@@ -43,13 +45,25 @@ public class Workspace implements Runnable{
 		int opening = input.length() - input.replace("(", "").length();
 		int closing = input.length() - input.replace(")", "").length();
 		if(opening != closing) throw new WorkspaceInputException("Number of '(' does not equal number of ')'.");
+		if(opening == 0 && closing == 0) return;
 		
 		// Check to see if starting/ending characters are invalid parenthesis
 		if(input.charAt(0) == ')' || input.charAt(input.length() - 1) == '(') throw new WorkspaceInputException("Invalid parentheses placement (start/end).");
 		
 		// Check to make sure all parenthesis are followed by valid characters
+		String characters = ".^*+-=)";
+		Pattern pattern = Pattern.compile("\\)[^" + characters + "]");
+		Matcher matcher = pattern.matcher(input);
+		if(matcher.find()) throw new WorkspaceInputException("Invalid character placement after ')'.");
 		
-		
+		String characterPattern = "\\([^a-zA-Z0-9(\\[]";
+		pattern = Pattern.compile(characterPattern);
+		matcher = pattern.matcher(input);
+		if(matcher.find()) throw new WorkspaceInputException("Invalid character placement after '('.");
+	}
+	
+	private void checkStatement(String input) throws WorkspaceInputException{
+		checkParentheses(input);
 	}
 	
 	private void evaluate(String input){
@@ -62,7 +76,11 @@ public class Workspace implements Runnable{
 			
 			String input = scanner.nextLine();
 			try{
-				initialCheck(input);
+				String[] statements = input.replace(" ", "").split(";|,");
+				for(int i = 0; i < statements.length; i++){
+					if(statements[i].isEmpty()) continue;
+					checkStatement(statements[i]);
+				}
 			}catch(WorkspaceInputException e){
 				String formattedOutput = formatter.formatError(input, e);
 				System.out.println(formattedOutput);
