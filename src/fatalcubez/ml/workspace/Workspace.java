@@ -62,8 +62,33 @@ public class Workspace implements Runnable{
 		if(matcher.find()) throw new WorkspaceInputException("Invalid character placement after '('.");
 	}
 	
+	private void checkBrackets(String input) throws WorkspaceInputException{
+		input = input.replace(" ", "");
+		
+		// Check to see if opening brackets count is same as closing
+		int opening = input.length() - input.replace("[", "").length();
+		int closing = input.length() - input.replace("]", "").length();
+		if(opening != closing) throw new WorkspaceInputException("Number of '[' does not equal number of ']'.");
+		if(opening == 0 && closing == 0) return;
+		
+		// Check to see if starting/ending characters are invalid brackets
+		if(input.charAt(0) == ']' || input.charAt(input.length() - 1) == '[') throw new WorkspaceInputException("Invalid bracket placement (start/end).");
+		
+		// Check to make sure all brackets are followed by valid characters
+		String characters = ".^*+-=)\\[\\],;";
+		Pattern pattern = Pattern.compile("\\][^" + characters + "]");
+		Matcher matcher = pattern.matcher(input);
+		if(matcher.find()) throw new WorkspaceInputException("Invalid character placement after ']'.");
+		
+		String characterPattern = "\\[[^a-zA-Z0-9(\\[]";
+		pattern = Pattern.compile(characterPattern);
+		matcher = pattern.matcher(input);
+		if(matcher.find()) throw new WorkspaceInputException("Invalid character placement after '['.");
+	}
+	
 	private void checkStatement(String input) throws WorkspaceInputException{
 		checkParentheses(input);
+		checkBrackets(input);
 	}
 	
 	private void evaluate(String input){
