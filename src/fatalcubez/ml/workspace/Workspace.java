@@ -88,6 +88,17 @@ public class Workspace implements Runnable{
 		if(matcher.find()) throw new WorkspaceInputException("Invalid character placement after '['.");
 	}
 	
+	private void checkAssignment(String input) throws WorkspaceInputException{
+		input = input.replace(" ", "");
+		if(!input.contains("=")) return;
+		if(input.split("=").length > 2) throw new WorkspaceInputException("Too many assignment operators ('=').");
+		String[] sides = input.split("=");
+		String left = sides[0];
+		String patternCharacters = "[^A-Za-z]";
+		Pattern pattern  = Pattern.compile(patternCharacters);
+		Matcher matcher = pattern.matcher(left);
+		if(matcher.find()) throw new WorkspaceInputException("The expression to the left of the equals sign is not a valid target for an assignment.");
+	}
 //	private void checkFunctions(String input){
 //		input = input.replace(" ", "");
 //		String[] words = input.replaceAll("[^A-Za-Z]", " ").split(" ");
@@ -104,6 +115,7 @@ public class Workspace implements Runnable{
 	private void checkStatement(String input) throws WorkspaceInputException{
 		checkParentheses(input);
 		checkBrackets(input);
+		checkAssignment(input);
 		//checkFunctions(input);
 	}
 	
@@ -151,20 +163,19 @@ public class Workspace implements Runnable{
 		while(scanner.hasNext() && listening){
 			
 			String input = scanner.nextLine();
-//			try{
+			try{
 				String[] statements = getStatements(input);
 				for(int i = 0; i < statements.length; i++){
 					if(statements[i].isEmpty()) continue;
-					//checkStatement(statements[i]);
-					//evaluate(statements[i]);
-					System.out.println(statements[i]);
+					checkStatement(statements[i]);
+					evaluate(statements[i]);
 				}
-//			}catch(WorkspaceInputException e){
-//				String formattedOutput = formatter.formatError(input, e);
-//				System.out.println(formattedOutput);
-//				System.out.print(">> ");
-//				continue;
-//			}
+			}catch(WorkspaceInputException e){
+				String formattedOutput = formatter.formatError(input, e);
+				System.out.println(formattedOutput);
+				System.out.print(">> ");
+				continue;
+			}
 			System.out.print(">> ");
 		}
 		scanner.close();
