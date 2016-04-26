@@ -1,6 +1,8 @@
 package fatalcubez.ml.workspace;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -86,13 +88,62 @@ public class Workspace implements Runnable{
 		if(matcher.find()) throw new WorkspaceInputException("Invalid character placement after '['.");
 	}
 	
+//	private void checkFunctions(String input){
+//		input = input.replace(" ", "");
+//		String[] words = input.replaceAll("[^A-Za-Z]", " ").split(" ");
+//		
+//		for(int i = 0; i < words.length; i++){
+//			String word = words[i];
+//			if(word.length() == 0) continue;
+//			for(Function func : Function.values()){
+//				
+//			}
+//		}
+//	}
+	
 	private void checkStatement(String input) throws WorkspaceInputException{
 		checkParentheses(input);
 		checkBrackets(input);
+		//checkFunctions(input);
 	}
 	
 	private void evaluate(String input){
 		
+	}
+	
+	private String[] getStatements(String input){
+		input = input.replace(" ", "");
+		int opening = 0;
+		List<String> statements = new ArrayList<String>();
+		int begin = 0;
+		int end = 0;
+		for(int i = 0; i < input.length(); i++){
+			end = i;
+			char currentChar = input.charAt(i);
+			if(i == input.length() - 1 && currentChar != ';' && currentChar != ','){
+				statements.add(input.substring(begin, input.length()));
+			}
+			switch(currentChar){
+			case '[':
+				opening++;
+				break;
+			case ']':
+				opening--;
+				break;
+			case ';':
+				if(opening == 0){
+					statements.add(input.substring(begin, end));
+					begin = end + 1;
+				}
+				break;
+			case ',':
+				if(opening == 0){
+					statements.add(input.substring(begin, end));
+					begin = end + 1;
+				}
+			}
+		}
+		return statements.toArray(new String[0]);
 	}
 	
 	@Override
@@ -100,19 +151,20 @@ public class Workspace implements Runnable{
 		while(scanner.hasNext() && listening){
 			
 			String input = scanner.nextLine();
-			try{
-				String[] statements = input.replace(" ", "").split(";|,");
+//			try{
+				String[] statements = getStatements(input);
 				for(int i = 0; i < statements.length; i++){
 					if(statements[i].isEmpty()) continue;
-					checkStatement(statements[i]);
+					//checkStatement(statements[i]);
+					//evaluate(statements[i]);
+					System.out.println(statements[i]);
 				}
-			}catch(WorkspaceInputException e){
-				String formattedOutput = formatter.formatError(input, e);
-				System.out.println(formattedOutput);
-				System.out.print(">> ");
-				continue;
-			}
-			evaluate(input);
+//			}catch(WorkspaceInputException e){
+//				String formattedOutput = formatter.formatError(input, e);
+//				System.out.println(formattedOutput);
+//				System.out.print(">> ");
+//				continue;
+//			}
 			System.out.print(">> ");
 		}
 		scanner.close();
