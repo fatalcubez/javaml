@@ -7,6 +7,8 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import fatalcubez.ml.workspace.functions.Function;
+
 public class Workspace implements Runnable{
 
 	private WorkspaceFormatter formatter;
@@ -98,6 +100,14 @@ public class Workspace implements Runnable{
 		Pattern pattern  = Pattern.compile(patternCharacters);
 		Matcher matcher = pattern.matcher(left);
 		if(matcher.find()) throw new WorkspaceInputException("The expression to the left of the equals sign is not a valid target for an assignment.");
+		boolean isFunction = false;
+		for(Function f : Function.values()){
+			if(left.equals(f.getConsoleName())) {
+				isFunction = true;
+				break;
+			}
+		}
+		if(isFunction) throw new WorkspaceInputException("Can't use function name in variable declaration.");
 	}
 //	private void checkFunctions(String input){
 //		input = input.replace(" ", "");
@@ -120,6 +130,17 @@ public class Workspace implements Runnable{
 	}
 	
 	private void evaluate(String input){
+		input = input.replace(" ", "");
+		
+		// First check to see if there is an assignment operator
+		if(input.indexOf('=') != -1){
+			String[] sides = input.split("=");
+			String left = sides[0];
+			String right = sides[1];
+		}
+	}
+	
+	private ExpressionValue simplify(String input){
 		
 	}
 	
