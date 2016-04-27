@@ -2,6 +2,7 @@ package fatalcubez.ml.workspace;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -15,10 +16,12 @@ public class Workspace implements Runnable{
 	private Scanner scanner;
 	private boolean listening;
 	private Thread thread;
+	private HashMap<String, ExpressionValue> workspaceVariables;
 	
 	public Workspace(InputStream in){
 		scanner = new Scanner(in);
 		formatter = new WorkspaceFormatter();
+		workspaceVariables = new HashMap<String, ExpressionValue>();
 		startListening();
 	}
 
@@ -129,15 +132,32 @@ public class Workspace implements Runnable{
 		//checkFunctions(input);
 	}
 	
-	private void evaluate(String input){
+	/**
+	 * Evaluates the expression passed in by a string.
+	 * 
+	 * @param input - String to be evaluated
+	 * @return a formatted string that can be used as output. 
+	 * String returned will be empty if display is set to false
+	 */
+	private String evaluate(String input, boolean display) throws WorkspaceInputException{
+		String ret = "";
 		input = input.replace(" ", "");
 		
 		// First check to see if there is an assignment operator
 		if(input.indexOf('=') != -1){
 			String[] sides = input.split("=");
-			String left = sides[0];
-			String right = sides[1];
+			String left = sides[0]; // left side is the variable name and must be saved
+			String right = sides[1]; // right side is going to be evaluated
+			ExpressionValue value = simplify(right);
+			workspaceVariables.put(left, value);
+			ret = formatter.formatAssignment(left, value);
 		}
+		else{
+			ExpressionValue value = simplify(input);
+			workspaceVariables.put("ans", value);
+			ret = formatter.formatAssignment("ans", value);
+		}
+		return display ? ret : "";
 	}
 	
 	private ExpressionValue simplify(String input){
@@ -189,7 +209,8 @@ public class Workspace implements Runnable{
 				for(int i = 0; i < statements.length; i++){
 					if(statements[i].isEmpty()) continue;
 					checkStatement(statements[i]);
-					evaluate(statements[i]);
+					String formattedOutput = evaluate(statements[i], true);
+					System.out.println(formattedOutput);
 				}
 			}catch(WorkspaceInputException e){
 				String formattedOutput = formatter.formatError(input, e);

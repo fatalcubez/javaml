@@ -8,4 +8,7 @@ public class WorkspaceFormatter {
 		return "\n" + tab + input + "\n" + tab + "Error: " + e.getMessage() + "\n"; 
 	}
 	
+	public String formatAssignment(String variable, ExpressionValue value){
+		
+	}
 }
