@@ -26,5 +26,13 @@ public enum Function {
 		return consoleName;
 	}
 	
+	public static Function getFunction(String functionName){
+		for(Function f : Function.values()){
+			if(functionName.equals(f.getConsoleName())) return f;
+		}
+		return null;
+	}
+	
 	public abstract IFunction getFunctionInstance();
+
 }

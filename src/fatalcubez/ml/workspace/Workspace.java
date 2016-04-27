@@ -103,13 +103,7 @@ public class Workspace implements Runnable{
 		Pattern pattern  = Pattern.compile(patternCharacters);
 		Matcher matcher = pattern.matcher(left);
 		if(matcher.find()) throw new WorkspaceInputException("The expression to the left of the equals sign is not a valid target for an assignment.");
-		boolean isFunction = false;
-		for(Function f : Function.values()){
-			if(left.equals(f.getConsoleName())) {
-				isFunction = true;
-				break;
-			}
-		}
+		boolean isFunction = Function.getFunction(left) != null;
 		if(isFunction) throw new WorkspaceInputException("Can't use function name in variable declaration.");
 	}
 //	private void checkFunctions(String input){
@@ -202,7 +196,6 @@ public class Workspace implements Runnable{
 	@Override
 	public void run() {
 		while(scanner.hasNext() && listening){
-			
 			String input = scanner.nextLine();
 			try{
 				String[] statements = getStatements(input);
