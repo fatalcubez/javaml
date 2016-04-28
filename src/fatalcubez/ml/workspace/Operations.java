@@ -73,5 +73,18 @@ public class Operations {
 		}
 		return value;
 	}
+	
+	public static ExpressionValue elementWiseMultiply(MatrixValue v1, MatrixValue v2) throws WorkspaceInputException{
+		if(v1.getMatrix().getColumnDimension() != v2.getMatrix().getColumnDimension() || v1.getMatrix().getRowDimension() != v2.getMatrix().getRowDimension()){
+			throw new WorkspaceInputException("Inner matrix dimensions must agree (" + v1.getMatrix().getColumnDimension() + " != " + v2.getMatrix().getRowDimension() + ").");
+		}
+		double[][] ret = new double[v1.getMatrix().getRowDimension()][v1.getMatrix().getColumnDimension()];
+		for(int i = 0; i < v1.getMatrix().getRowDimension(); i++){
+			for(int j = 0; j < v1.getMatrix().getColumnDimension(); j++){
+				ret[i][j] = v1.getMatrix().getEntry(i, j) * v2.getMatrix().getEntry(i, j);
+			}
+		}
+		return new MatrixValue(ret);
+	}
 
 }
