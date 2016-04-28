@@ -158,7 +158,7 @@ public class Workspace implements Runnable {
 	}
 
 	private ExpressionValue simplify(String input) {
-
+		
 	}
 
 	/**
@@ -167,7 +167,7 @@ public class Workspace implements Runnable {
 	 * @param input
 	 * @return a two object list where the first object in the list is an array
 	 *         of all the statements and the second object is a list of all the
-	 *         boolean values for whether or not each value should be displayed
+	 *         boolean values for whether or not each value should be displayed.
 	 */
 	private List<Object> getStatements(String input) {
 		input = input.replace(" ", "");
