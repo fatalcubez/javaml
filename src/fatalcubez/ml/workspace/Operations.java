@@ -74,6 +74,25 @@ public class Operations {
 		return value;
 	}
 	
+	public static ExpressionValue power(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException{
+		if(v1 instanceof ScalarValue && v2 instanceof ScalarValue){
+			return power((ScalarValue)v1, (ScalarValue)v2);
+		}
+		if(v1 instanceof MatrixValue && v2 instanceof ScalarValue){
+			return power((MatrixValue)v1, (ScalarValue)v2);
+		}
+		throw new WorkspaceInputException("Invalid expression arguments for '^' function.");
+	}
+	
+	private static ExpressionValue power(ScalarValue v1, ScalarValue v2){
+		return new ScalarValue(Math.pow(v1.getScalar(), v2.getScalar()));
+	}
+	
+	private static ExpressionValue power(MatrixValue v1, ScalarValue v2) throws WorkspaceInputException{
+		if(v2.getScalar() != Math.floor(v2.getScalar())) throw new WorkspaceInputException("Must use integers when raising a matrix to a power.");
+		return new MatrixValue(v1.getMatrix().power((int)Math.floor(v2.getScalar())));
+	}
+	
 	public static ExpressionValue elementWiseMultiply(MatrixValue v1, MatrixValue v2) throws WorkspaceInputException{
 		if(!isValidDimensions(v1, v2)){
 			throw new WorkspaceInputException("Inner matrix dimensions must agree (" + v1.getMatrix().getColumnDimension() + " != " + v2.getMatrix().getRowDimension() + ").");
