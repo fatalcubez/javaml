@@ -2,7 +2,7 @@ package fatalcubez.ml.workspace;
 
 import org.apache.commons.math3.linear.MatrixDimensionMismatchException;
 
-public class Operations {
+public class MatOp {
 
 	public static ExpressionValue multiply(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException{
 		if (v1 instanceof ScalarValue && v2 instanceof ScalarValue) {
