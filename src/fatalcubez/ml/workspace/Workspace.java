@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import fatalcubez.ml.workspace.functions.Function;
+import fatalcubez.ml.workspace.operations.Operation;
 
 public class Workspace implements Runnable {
 
@@ -157,8 +158,55 @@ public class Workspace implements Runnable {
 		return display ? ret : "";
 	}
 
-	private ExpressionValue simplify(String input) {
+	private ExpressionValue simplify(String input) throws WorkspaceInputException{
+		int begin = 0;
+		int end = 0;
+		ExpressionValue v1 = null;
+		ExpressionValue v2 = null;
+		Operation operation = null;
+		boolean isNegative = false;
 		
+		for(int i = 0; i < input.length(); i++){
+			end = i;
+			String character = input.substring(i, i+1);
+			Operation currentOperator = Operation.getOperation(character);
+			
+			// If an operator character is detected
+			if(currentOperator != null){
+				// In the case where an operation is present but no initial value has been found, throw an exception as long as the operation
+				// isn't a subtraction or addition 
+				if(v1 == null && !(currentOperator.equals(Operation.ADD) || currentOperator.equals(Operation.SUBTRACT))){
+					throw new WorkspaceInputException("Invalid placement of operator: '" + currentOperator.getConsoleName() + "'.");
+				}
+				else if(v1 == null && currentOperator.equals(Operation.ADD)){
+					continue;
+				}
+				else if(v1 == null && currentOperator.equals(Operation.SUBTRACT)){
+					isNegative = !isNegative;
+					continue;
+				}
+				
+				// Make sure multiple operators are not placed next to each other
+				if(operation != null && !(currentOperator.equals(Operation.ADD) || currentOperator.equals(Operation.SUBTRACT))){
+					throw new WorkspaceInputException("Multiple operators invalidly placed in a row.");
+				}
+				else if(operation != null && currentOperator.equals(Operation.ADD)){
+					continue;
+				}
+				else if(operation != null && currentOperator.equals(Operation.SUBTRACT)){
+					isNegative = !isNegative;
+					continue;
+				}
+				
+				operation = currentOperator;
+			}
+			// If there's a period two cases: part of a decimal number or part of element-wise operator
+			else if(character.equals(".")){
+				
+			}
+		}
+		
+		return v1;
 	}
 
 	/**

@@ -9,6 +9,6 @@ public class WorkspaceFormatter {
 	}
 	
 	public String formatAssignment(String variable, ExpressionValue value){
-		
+		return "";
 	}
 }
