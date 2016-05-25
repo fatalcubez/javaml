@@ -7,7 +7,7 @@ import fatalcubez.ml.workspace.WorkspaceInputException;
 public class AddOperation implements IOperation{
 
 	@Override
-	public ExpressionValue evaluate(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException {
+	public ExpressionValue evaluate(ExpressionValue v1, ExpressionValue v2, boolean elementWise) throws WorkspaceInputException {
 		return MatOp.add(v1, v2);
 	}
 

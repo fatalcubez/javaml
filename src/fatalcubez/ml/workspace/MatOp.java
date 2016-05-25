@@ -39,6 +39,40 @@ public class MatOp {
 		return value;
 	}
 	
+	public static ExpressionValue divide(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException{
+		if (v1 instanceof ScalarValue && v2 instanceof ScalarValue) {
+			return multiply((ScalarValue)v1, (ScalarValue)reciprocal(v2));
+		}
+		if(v1 instanceof ScalarValue && v2 instanceof MatrixValue){
+			return multiply((ScalarValue)v1, (MatrixValue)reciprocal(v2));
+		}
+		if(v1 instanceof MatrixValue && v2 instanceof ScalarValue){
+			return multiply((ScalarValue)reciprocal(v2), (MatrixValue)v1);
+		}
+		if(v1 instanceof MatrixValue && v2 instanceof MatrixValue){
+			throw new WorkspaceInputException("Can't divide two matrices.");
+		}
+		return null;
+	}
+	
+	public static ExpressionValue reciprocal(ExpressionValue v1){
+		if(v1 instanceof ScalarValue){
+			ScalarValue sV = (ScalarValue)v1;
+			sV.setScalar(1.0d / sV.getScalar());
+			return sV;
+		}
+		if(v1 instanceof MatrixValue){
+			MatrixValue mV = (MatrixValue)v1;
+			for(int i = 0; i < mV.getMatrix().getRowDimension(); i++){
+				for(int j = 0; j < mV.getMatrix().getColumnDimension(); j++){
+					mV.getMatrix().setEntry(i, j, 1.0d / mV.getMatrix().getEntry(i, j));
+				}
+			}
+			return mV;
+		}
+		return null;
+	}
+	
 	public static ExpressionValue add(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException {
 		if (v1 instanceof ScalarValue && v2 instanceof ScalarValue) {
 			return add((ScalarValue)v1, (ScalarValue)v2);
@@ -74,6 +108,20 @@ public class MatOp {
 		return value;
 	}
 	
+	public static ExpressionValue subtract(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException {
+		v2 = multiply(new ScalarValue(-1.0d), v2);
+		return add(v1, v2);
+	}
+	
+	/**
+	 * Computes the value when v1 is raised to the v2 power. Currently doesn't work for raising
+	 * a scalar to a matrix value or a matrix value raised to another matrix value
+	 * 
+	 * @param v1
+	 * @param v2
+	 * @return
+	 * @throws WorkspaceInputException
+	 */
 	public static ExpressionValue power(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException{
 		if(v1 instanceof ScalarValue && v2 instanceof ScalarValue){
 			return power((ScalarValue)v1, (ScalarValue)v2);
@@ -90,6 +138,8 @@ public class MatOp {
 	
 	private static ExpressionValue power(MatrixValue v1, ScalarValue v2) throws WorkspaceInputException{
 		if(v2.getScalar() != Math.floor(v2.getScalar())) throw new WorkspaceInputException("Must use integers when raising a matrix to a power.");
+		if(!v1.getMatrix().isSquare()) throw new WorkspaceInputException("Must use a SQUARE matrix as input.");
+		if(v2.getScalar() < 0) throw new WorkspaceInputException("Can't raise matrix to a negative power.");
 		return new MatrixValue(v1.getMatrix().power((int)Math.floor(v2.getScalar())));
 	}
 	
@@ -105,8 +155,57 @@ public class MatOp {
 		}
 		return new MatrixValue(ret);
 	}
+	
+	public static ExpressionValue elementWiseDivide(MatrixValue v1, MatrixValue v2) throws WorkspaceInputException{
+		if(!isValidDimensions(v1, v2)){
+			throw new WorkspaceInputException("Inner matrix dimensions must agree (" + v1.getMatrix().getColumnDimension() + " != " + v2.getMatrix().getRowDimension() + ").");
+		}
+		double[][] ret = new double[v1.getMatrix().getRowDimension()][v1.getMatrix().getColumnDimension()];
+		for(int i = 0; i < v1.getMatrix().getRowDimension(); i++){
+			for(int j = 0; j < v1.getMatrix().getColumnDimension(); j++){
+				ret[i][j] = v1.getMatrix().getEntry(i, j) * (1.0d / v2.getMatrix().getEntry(i, j));
+			}
+		}
+		return new MatrixValue(ret);
+	}
 
-	public static ExpressionValue elementWisePower(MatrixValue v1, MatrixValue v2) throws WorkspaceInputException{
+	public static ExpressionValue elementWisePower(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException{
+		if (v1 instanceof ScalarValue && v2 instanceof ScalarValue) {
+			return power(v1, v2);
+		}
+		if(v1 instanceof ScalarValue && v2 instanceof MatrixValue){
+			return elementWisePower((ScalarValue)v1, (MatrixValue)v2);
+		}
+		if(v1 instanceof MatrixValue && v2 instanceof ScalarValue){
+			return elementWisePower((MatrixValue)v1, (ScalarValue)v2);
+		}
+		if(v1 instanceof MatrixValue && v2 instanceof MatrixValue){
+			return elementWisePower((MatrixValue)v1, (MatrixValue)v2);
+		}
+		return null;
+	}
+	
+	private static ExpressionValue elementWisePower(ScalarValue v1, MatrixValue v2) throws WorkspaceInputException{
+		double[][] ret = new double[v2.getMatrix().getRowDimension()][v2.getMatrix().getColumnDimension()];
+		for(int i = 0; i < v2.getMatrix().getRowDimension(); i++){
+			for(int j = 0; j < v2.getMatrix().getColumnDimension(); j++){
+				ret[i][j] = Math.pow(v1.getScalar(), v2.getMatrix().getEntry(i, j));
+			}
+		}
+		return new MatrixValue(ret);
+	}
+	
+	private static ExpressionValue elementWisePower(MatrixValue v1, ScalarValue v2) throws WorkspaceInputException{
+		double[][] ret = new double[v1.getMatrix().getRowDimension()][v1.getMatrix().getColumnDimension()];
+		for(int i = 0; i < v1.getMatrix().getRowDimension(); i++){
+			for(int j = 0; j < v1.getMatrix().getColumnDimension(); j++){
+				ret[i][j] = Math.pow(v1.getMatrix().getEntry(i, j), v2.getScalar());
+			}
+		}
+		return new MatrixValue(ret);
+	}
+	
+	private static ExpressionValue elementWisePower(MatrixValue v1, MatrixValue v2) throws WorkspaceInputException{
 		if(!isValidDimensions(v1, v2)){
 			throw new WorkspaceInputException("Inner matrix dimensions must agree (" + v1.getMatrix().getColumnDimension() + " != " + v2.getMatrix().getRowDimension() + ").");
 		}

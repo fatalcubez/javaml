@@ -5,6 +5,6 @@ import fatalcubez.ml.workspace.WorkspaceInputException;
 
 public interface IOperation {
 
-	public ExpressionValue evaluate(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException;
+	public ExpressionValue evaluate(ExpressionValue v1, ExpressionValue v2, boolean elementWise) throws WorkspaceInputException;
 	
 }

@@ -6,25 +6,31 @@ public enum Operation {
 	ADD("+") {
 		@Override
 		public IOperation getOperationInstance() {
-			return null;
+			return new AddOperation();
 		}
 	},
 	SUBTRACT("-") {
 		@Override
 		public IOperation getOperationInstance() {
-			return null;
+			return new SubtractOperation();
 		}
 	},
 	MULTIPLY("*") {
 		@Override
 		public IOperation getOperationInstance() {
-			return null;
+			return new MultiplyOperation();
 		}
 	},
 	DIVIDE("/") {
 		@Override
 		public IOperation getOperationInstance() {
-			return null;
+			return new DivideOperation();
+		}
+	},
+	POWER("^"){
+		@Override
+		public IOperation getOperationInstance() {
+			return new PowerOperation();
 		}
 	};
 	
