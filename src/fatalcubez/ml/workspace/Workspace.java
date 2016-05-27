@@ -167,7 +167,8 @@ public class Workspace implements Runnable {
 		ExpressionValue v2 = null;
 		Operation operation = null;
 		boolean isNegative = false;
-		boolean elementWise = false;
+		boolean elementWise1 = false;
+		boolean elementWise2 = false;
 		
 		for(int i = 0; i < input.length(); i++){
 			end = i;
@@ -240,6 +241,7 @@ public class Workspace implements Runnable {
 					v1 = operation.getOperationInstance().evaluate(v1, v2, elementWise);
 					v2 = null;
 					operation = currentOperator;
+					elementWise = false;
 					begin = end;
 					continue;
 				}
