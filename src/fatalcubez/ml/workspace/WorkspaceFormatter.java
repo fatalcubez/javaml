@@ -11,7 +11,7 @@ public class WorkspaceFormatter {
 	public String formatAssignment(String variable, ExpressionValue value){
 		String formattedValue = "";
 		if(value instanceof ScalarValue){
-			formattedValue = "" + ((ScalarValue)value).getScalar();
+			formattedValue = "" + String.format("%.4f",((ScalarValue)value).getScalar());
 		}
 		return "\n" + variable + " =\n\n" + tab + formattedValue + "\n";
 	}
