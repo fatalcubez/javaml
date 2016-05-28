@@ -65,7 +65,7 @@ public class Workspace implements Runnable {
 		Matcher matcher = pattern.matcher(input);
 		if (matcher.find()) throw new WorkspaceInputException("Invalid character placement after ')'.");
 
-		String characterPattern = "\\([^a-zA-Z0-9(\\[]";
+		String characterPattern = "\\([^a-zA-Z0-9\\+\\-(\\[]";
 		pattern = Pattern.compile(characterPattern);
 		matcher = pattern.matcher(input);
 		if (matcher.find()) throw new WorkspaceInputException("Invalid character placement after '('.");
@@ -160,99 +160,123 @@ public class Workspace implements Runnable {
 	}
 
 	private ExpressionValue simplify(String input) throws WorkspaceInputException{
-		int begin = 0;
-		int end = 0;
-		ExpressionValue v1 = null;
-		ExpressionValue v2 = null;
-		Operation operation = null;
-		boolean isNegative = false;
-		boolean elementWise1 = false;
-		boolean elementWise2 = false;
+//		int begin = 0;
+//		int end = 0;
+//		ExpressionValue v1 = null;
+//		ExpressionValue v2 = null;
+//		Operation operation = null;
+//		boolean isNegative = false;
+//		boolean elementWise1 = false;
+//		boolean elementWise2 = false;
+//		
+//		for(int i = 0; i < input.length(); i++){
+//			end = i;
+//			String character = input.substring(i, i+1);
+//			Operation currentOperator = Operation.getOperation(character);
+//			
+//			// If there's a period two cases: part of a decimal number or part of element-wise operator
+//			if(character.equals(".")){
+//				char c;
+//				try{
+//					c = input.charAt(i + 1);
+//				}catch(IndexOutOfBoundsException e){
+//					throw new WorkspaceInputException("Can't end statement with a period.");
+//				}
+//				// If the next character is a digit
+//				if(c >= '0' && c <= '9'){
+//					continue;
+//				}
+//				// If the next character is an operator
+//				else if(Operation.getOperation(Character.toString(c)) != null){
+//					elementWise = true;
+//					i++;
+//					end = i;
+//					character = input.substring(i, i+1);
+//					currentOperator = Operation.getOperation(character);
+//				}
+//				else{
+//					throw new WorkspaceInputException("Invalid character following a period.");
+//				}
+//			}
+//			
+//			// If an operator character is detected
+//			if(currentOperator != null){
+//				// In the case where an operation is present but no initial value has been found, throw an exception as long as the operation
+//				// isn't a subtraction or addition 
+//				if(v1 == null && !(currentOperator.equals(Operation.ADD) || currentOperator.equals(Operation.SUBTRACT))){
+//					throw new WorkspaceInputException("Invalid placement of operator: '" + currentOperator.getConsoleName() + "'.");
+//				}
+//				else if(v1 == null && currentOperator.equals(Operation.ADD)){
+//					continue;
+//				}
+//				else if(v1 == null && currentOperator.equals(Operation.SUBTRACT)){
+//					isNegative = !isNegative;
+//					continue;
+//				}
+//				
+//				// Make sure multiple operators are not placed next to each other
+//				if(operation != null && !(currentOperator.equals(Operation.ADD) || currentOperator.equals(Operation.SUBTRACT)) && Operation.getOperation(input.substring(i-1, i)) != null){
+//					throw new WorkspaceInputException("Multiple operators invalidly placed in a row.");
+//				}
+//				else if(operation != null && currentOperator.equals(Operation.ADD)){
+//					continue;
+//				}
+//				else if(operation != null && currentOperator.equals(Operation.SUBTRACT)){
+//					isNegative = !isNegative;
+//					continue;
+//				}
+//				
+//				// Two cases at this point:
+//				// 1. v1 and operation both exist, and so v2 must be parsed and combined
+//				// 2. v1 and operation don't exist, so operation must be equal to currentOperator and v1 parsed
+//				if(v1 == null && operation == null){
+//					operation = currentOperator;
+//					v1 = parseValue(input.substring(begin, end));
+//					begin = end;
+//					continue;
+//				}
+//				else if(v1 != null && operation != null){
+//					v2 = parseValue(input.substring(begin, end));
+//					v1 = operation.getOperationInstance().evaluate(v1, v2, elementWise);
+//					v2 = null;
+//					operation = currentOperator;
+//					elementWise = false;
+//					begin = end;
+//					continue;
+//				}
+//				else{
+//					throw new WorkspaceInputException("Unknown error....");
+//				}
+//				
+//				
+//			}
+//		}
+//		
+//		return v1;
 		
-		for(int i = 0; i < input.length(); i++){
-			end = i;
-			String character = input.substring(i, i+1);
-			Operation currentOperator = Operation.getOperation(character);
-			
-			// If there's a period two cases: part of a decimal number or part of element-wise operator
-			if(character.equals(".")){
-				char c;
-				try{
-					c = input.charAt(i + 1);
-				}catch(IndexOutOfBoundsException e){
-					throw new WorkspaceInputException("Can't end statement with a period.");
-				}
-				// If the next character is a digit
-				if(c >= '0' && c <= '9'){
-					continue;
-				}
-				// If the next character is an operator
-				else if(Operation.getOperation(Character.toString(c)) != null){
-					elementWise = true;
-					i++;
-					end = i;
-					character = input.substring(i, i+1);
-					currentOperator = Operation.getOperation(character);
+		// Looking for + or -
+		for(int i = input.length() - 1; i >= 0; i--){
+			char current = input.charAt(i);
+			if(current == '+' || current == '-'){
+				boolean elementWise = false;
+				if(i == input.length() - 1) throw new WorkspaceInputException("Operation missing second term.");
+				if(i-1 == 0 && input.charAt(i-1) == '.') throw new WorkspaceInputException("Invalid use of dot operator.");
+				if(i-1 > 0 && input.charAt(i-1) == '.') elementWise = true;
+				ExpressionValue v1 = null;
+				if(i == 0){
+					v1 = new ScalarValue(0.0d);
 				}
 				else{
-					throw new WorkspaceInputException("Invalid character following a period.");
+					v1 = elementWise ? simplify(input.substring(0, i-1)) : simplify(input.substring(0, i));
 				}
-			}
-			
-			// If an operator character is detected
-			if(currentOperator != null){
-				// In the case where an operation is present but no initial value has been found, throw an exception as long as the operation
-				// isn't a subtraction or addition 
-				if(v1 == null && !(currentOperator.equals(Operation.ADD) || currentOperator.equals(Operation.SUBTRACT))){
-					throw new WorkspaceInputException("Invalid placement of operator: '" + currentOperator.getConsoleName() + "'.");
+				if (current == '+') {
+					return Operation.ADD.getOperationInstance().evaluate(v1, simplify(input.substring(i + 1, input.length())), elementWise);
+				} else {
+					return Operation.SUBTRACT.getOperationInstance().evaluate(v1, simplify(input.substring(i + 1, input.length())), elementWise);
 				}
-				else if(v1 == null && currentOperator.equals(Operation.ADD)){
-					continue;
-				}
-				else if(v1 == null && currentOperator.equals(Operation.SUBTRACT)){
-					isNegative = !isNegative;
-					continue;
-				}
-				
-				// Make sure multiple operators are not placed next to each other
-				if(operation != null && !(currentOperator.equals(Operation.ADD) || currentOperator.equals(Operation.SUBTRACT)) && Operation.getOperation(input.substring(i-1, i)) != null){
-					throw new WorkspaceInputException("Multiple operators invalidly placed in a row.");
-				}
-				else if(operation != null && currentOperator.equals(Operation.ADD)){
-					continue;
-				}
-				else if(operation != null && currentOperator.equals(Operation.SUBTRACT)){
-					isNegative = !isNegative;
-					continue;
-				}
-				
-				// Two cases at this point:
-				// 1. v1 and operation both exist, and so v2 must be parsed and combined
-				// 2. v1 and operation don't exist, so operation must be equal to currentOperator and v1 parsed
-				if(v1 == null && operation == null){
-					operation = currentOperator;
-					v1 = parseValue(input.substring(begin, end));
-					begin = end;
-					continue;
-				}
-				else if(v1 != null && operation != null){
-					v2 = parseValue(input.substring(begin, end));
-					v1 = operation.getOperationInstance().evaluate(v1, v2, elementWise);
-					v2 = null;
-					operation = currentOperator;
-					elementWise = false;
-					begin = end;
-					continue;
-				}
-				else{
-					throw new WorkspaceInputException("Unknown error....");
-				}
-				
-				
 			}
 		}
-		
-		return v1;
+		return parseValue(input);
 	}
 	
 	private String condenseOperators(String input){
@@ -268,7 +292,14 @@ public class Workspace implements Runnable {
 				input = input.replace(matcher.group(), "+");
 			}
 		}
+		characters = "[*\\/^\\(\\[,\\;]\\+";
+		pattern = Pattern.compile(characters);
+		matcher = pattern.matcher(input);
+		while(matcher.find()){
+			input = input.replace(matcher.group(), matcher.group().substring(0, 1));
+		}
 		input = input.replaceAll("^\\+", "");
+		System.out.println(input);
 		return input;
 	}
 	
