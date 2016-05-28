@@ -146,8 +146,7 @@ public class Workspace implements Runnable {
 			String[] sides = input.split("=");
 			
 			// TODO: Error checking -> variable name can't contain special characters or be the name of a function
-			String left = sides[0]; // left side is the variable name and must
-									// be saved
+			String left = sides[0]; // left side is the variable name and must be saved
 			String right = sides[1]; // right side is going to be evaluated
 			ExpressionValue value = simplify(right);
 			workspaceVariables.put(left, value);
@@ -256,6 +255,23 @@ public class Workspace implements Runnable {
 		return v1;
 	}
 	
+	private String condenseOperators(String input){
+		String characters = "[+-]{2,}";
+		Pattern pattern = Pattern.compile(characters);
+		Matcher matcher = pattern.matcher(input);
+		while(matcher.find()){
+			int count = matcher.group().length() - matcher.group().replace("-", "").length();
+			if(count % 2 == 1){
+				input = input.replace(matcher.group(), "-");
+			}
+			else{
+				input = input.replace(matcher.group(), "+");
+			}
+		}
+		input = input.replaceAll("^\\+", "");
+		return input;
+	}
+	
 	
 	private ExpressionValue parseValue(String input) throws WorkspaceInputException{
 //		String patternCharacters = "^[A-Za-z][A-Za-z0-9_]*$";
@@ -269,7 +285,7 @@ public class Workspace implements Runnable {
 //			throw new WorkspaceInputException("Can't parse ")
 //		}
 		if(workspaceVariables.containsKey(input)) return workspaceVariables.get(input);
-		String patternCharacters = "[^0-9.]";
+		String patternCharacters = "[^0-9.-]";
 		Pattern pattern = Pattern.compile(patternCharacters);
 		Matcher matcher = pattern.matcher(input);
 		if (matcher.find()) throw new WorkspaceInputException("Parse error: " + input);
@@ -338,6 +354,7 @@ public class Workspace implements Runnable {
 				for (int i = 0; i < statements.length; i++) {
 					if (statements[i].isEmpty()) continue;
 					checkStatement(statements[i]);
+					statements[i] = condenseOperators(input);
 					String formattedOutput = evaluate(statements[i], displayValues[i]);
 					if (!formattedOutput.isEmpty()) System.out.println(formattedOutput);
 				}
