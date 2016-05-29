@@ -380,6 +380,8 @@ public class Workspace implements Runnable {
 	private MatrixValue parseMatrix(String input) throws WorkspaceInputException{
 		String[] rows = input.split(";");
 		
+		//TODO: [[1;2],[3;4]] won't work because the split(";") doesn't account for matrices inside of other matrices
+		
 		if(rows.length == 1){
 			// HORIZONTAL CONCATENATION
 			String row = rows[0];
@@ -494,6 +496,7 @@ public class Workspace implements Runnable {
 	 *         boolean values for whether or not each value should be displayed.
 	 */
 	private List<Object> getStatements(String input) {
+		//TODO: Allow spaces to be delimiters for splitting between matrix elements
 		input = input.replace(" ", "");
 		int opening = 0;
 		List<String> statements = new ArrayList<String>();
