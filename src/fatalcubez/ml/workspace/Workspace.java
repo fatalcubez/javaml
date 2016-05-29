@@ -381,26 +381,26 @@ public class Workspace implements Runnable {
 		String[] rows = input.split(";");
 		
 		if(rows.length == 1){
+			// HORIZONTAL CONCATENATION
 			String row = rows[0];
 			String[] elements = row.split(",");
 			List<ExpressionValue> rowElements = new ArrayList<ExpressionValue>();
-			int numColumns = 0;
+			int numCols = 0;
 			int numRows = 0;
 			for(int i = 0; i < elements.length; i++){
 				ExpressionValue v = simplify(elements[i]);
 				if(v instanceof MatrixValue){
-					numColumns += ((MatrixValue)v).getMatrix().getColumnDimension();
+					numCols += ((MatrixValue)v).getMatrix().getColumnDimension();
 					numRows = ((MatrixValue)v).getMatrix().getRowDimension();
 				}else {
-					numColumns++;
+					numCols++;
 					numRows = 1;
 				}
 				rowElements.add(v);
 			}
-			RealMatrix matrix = MatrixUtils.createRealMatrix(numRows, numColumns);
+			RealMatrix matrix = MatrixUtils.createRealMatrix(numRows, numCols);
 			int columnIndex = 0;
-			for(int i = 0; i < rowElements.size(); i++){
-				ExpressionValue v = rowElements.get(i);
+			for(ExpressionValue v : rowElements){
 				if(v instanceof MatrixValue){
 					MatrixValue mV = (MatrixValue)v;
 					if(mV.getMatrix().getRowDimension() != matrix.getRowDimension()) throw new WorkspaceInputException("Horizontal concat dimension mismatch.");
@@ -416,7 +416,27 @@ public class Workspace implements Runnable {
 			}
 			return new MatrixValue(matrix);
 		}
-		return null;
+		else{
+			// VERTICAL CONCATENATION
+			List<MatrixValue> columnElements = new ArrayList<MatrixValue>();
+			int numRows = 0;
+			int numCols = 0;
+			for(int i = 0; i < rows.length; i++){
+				String row = rows[i];
+				MatrixValue rowValue = parseMatrix(row);
+				numCols = rowValue.getMatrix().getColumnDimension();
+				numRows += rowValue.getMatrix().getRowDimension();
+				columnElements.add(rowValue);
+			}
+			RealMatrix matrix = MatrixUtils.createRealMatrix(numRows, numCols);
+			int rowIndex = 0;
+			for(MatrixValue mV : columnElements){
+				if(mV.getMatrix().getColumnDimension() != matrix.getColumnDimension()) throw new WorkspaceInputException("Vertical concat dimension mismatch.");
+				matrix.setSubMatrix(mV.getMatrix().getData(), rowIndex, 0);
+				rowIndex += mV.getMatrix().getRowDimension();
+			}
+			return new MatrixValue(matrix);
+		}
 	}
 
 	private String condenseOperators(String input) {
