@@ -378,19 +378,63 @@ public class Workspace implements Runnable {
 	}
 	
 	private MatrixValue parseMatrix(String input) throws WorkspaceInputException{
-		String[] rows = input.split(";");
+//		String[] rows = input.split(";");
 		
 		//TODO: [[1;2],[3;4]] won't work because the split(";") doesn't account for matrices inside of other matrices
 		
-		if(rows.length == 1){
+		List<String> rows = new ArrayList<String>();
+		
+		int opening = 0;
+		int begin = 0;
+		for(int i = 0; i < input.length(); i++){
+			char c = input.charAt(i);
+			if(c == '['){
+				opening++;
+				continue;
+			}
+			if(c == ']'){
+				opening--;
+				continue;
+			}
+			if(c == ';' && opening == 0){
+				String sub = input.substring(begin, i);
+				if(!sub.isEmpty()) rows.add(sub);
+				begin = i + 1;
+			}
+		}
+		rows.add(input.substring(begin));
+		
+		if(rows.size() == 1){
 			// HORIZONTAL CONCATENATION
-			String row = rows[0];
-			String[] elements = row.split(",");
+			String row = rows.get(0);
+			List<String> elements = new ArrayList<String>();
+			
+			opening = 0;
+			begin = 0;
+			for(int i = 0; i < row.length(); i++){
+				char c = row.charAt(i);
+				if(c == '['){
+					opening++;
+					continue;
+				}
+				if(c == ']'){
+					opening--;
+					continue;
+				}
+				if(c == ',' && opening == 0){
+					String sub = row.substring(begin, i);
+					if(!sub.isEmpty()) elements.add(sub);
+					begin = i + 1;
+				}
+			}
+			elements.add(row.substring(begin));
+			
+			
 			List<ExpressionValue> rowElements = new ArrayList<ExpressionValue>();
 			int numCols = 0;
 			int numRows = 0;
-			for(int i = 0; i < elements.length; i++){
-				ExpressionValue v = simplify(elements[i]);
+			for(int i = 0; i < elements.size(); i++){
+				ExpressionValue v = simplify(elements.get(i));
 				if(v instanceof MatrixValue){
 					numCols += ((MatrixValue)v).getMatrix().getColumnDimension();
 					numRows = ((MatrixValue)v).getMatrix().getRowDimension();
@@ -423,8 +467,8 @@ public class Workspace implements Runnable {
 			List<MatrixValue> columnElements = new ArrayList<MatrixValue>();
 			int numRows = 0;
 			int numCols = 0;
-			for(int i = 0; i < rows.length; i++){
-				String row = rows[i];
+			for(int i = 0; i < rows.size(); i++){
+				String row = rows.get(i);
 				MatrixValue rowValue = parseMatrix(row);
 				numCols = rowValue.getMatrix().getColumnDimension();
 				numRows += rowValue.getMatrix().getRowDimension();
