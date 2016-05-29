@@ -8,6 +8,9 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.linear.RealMatrix;
+
 import fatalcubez.ml.workspace.functions.Function;
 import fatalcubez.ml.workspace.operations.IOperation;
 import fatalcubez.ml.workspace.operations.Operation;
@@ -274,11 +277,11 @@ public class Workspace implements Runnable {
 		// Looking for + or -
 		for (int i = input.length() - 1; i >= 0; i--) {
 			char current = input.charAt(i);
-			if(current == '('){
+			if(current == '(' || current == '['){
 				opening++;
 				continue;
 			}
-			if(current == ')'){
+			if(current == ')' || current == ']'){
 				opening--;
 				continue;
 			}
@@ -310,11 +313,11 @@ public class Workspace implements Runnable {
 		// Looking for * or /
 		for (int i = input.length() - 1; i >= 0; i--) {
 			char current = input.charAt(i);
-			if(current == '('){
+			if(current == '(' || current == '['){
 				opening++;
 				continue;
 			}
-			if(current == ')'){
+			if(current == ')' || current == ']'){
 				opening--;
 				continue;
 			}
@@ -342,11 +345,11 @@ public class Workspace implements Runnable {
 		// Looking for ^
 		for (int i = input.length() - 1; i >= 0; i--) {
 			char current = input.charAt(i);
-			if(current == '('){
+			if(current == '(' || current == '['){
 				opening++;
 				continue;
 			}
-			if(current == ')'){
+			if(current == ')' || current == ']'){
 				opening--;
 				continue;
 			}
@@ -368,8 +371,52 @@ public class Workspace implements Runnable {
 		if(input.charAt(0) == '(' && input.charAt(input.length() - 1) == ')'){
 			return simplify(input.substring(1, input.length() - 1));
 		}
-		
+		if(input.charAt(0) == '[' && input.charAt(input.length() - 1) == ']'){
+			return parseMatrix(input.substring(1, input.length() - 1));
+		}
 		return parseValue(input);
+	}
+	
+	private MatrixValue parseMatrix(String input) throws WorkspaceInputException{
+		String[] rows = input.split(";");
+		
+		if(rows.length == 1){
+			String row = rows[0];
+			String[] elements = row.split(",");
+			List<ExpressionValue> rowElements = new ArrayList<ExpressionValue>();
+			int numColumns = 0;
+			int numRows = 0;
+			for(int i = 0; i < elements.length; i++){
+				ExpressionValue v = simplify(elements[i]);
+				if(v instanceof MatrixValue){
+					numColumns += ((MatrixValue)v).getMatrix().getColumnDimension();
+					numRows = ((MatrixValue)v).getMatrix().getRowDimension();
+				}else {
+					numColumns++;
+					numRows = 1;
+				}
+				rowElements.add(v);
+			}
+			RealMatrix matrix = MatrixUtils.createRealMatrix(numRows, numColumns);
+			int columnIndex = 0;
+			for(int i = 0; i < rowElements.size(); i++){
+				ExpressionValue v = rowElements.get(i);
+				if(v instanceof MatrixValue){
+					MatrixValue mV = (MatrixValue)v;
+					if(mV.getMatrix().getRowDimension() != matrix.getRowDimension()) throw new WorkspaceInputException("Horizontal concat dimension mismatch.");
+					matrix.setSubMatrix(mV.getMatrix().getData(), 0, columnIndex);
+					columnIndex += mV.getMatrix().getColumnDimension();
+				}
+				else{
+					ScalarValue sV = (ScalarValue)v;
+					if(matrix.getRowDimension() != 1) throw new WorkspaceInputException("Horizontal concat dimension mismatch.");
+					matrix.setEntry(0, columnIndex, sV.getScalar());
+					columnIndex++;
+				}
+			}
+			return new MatrixValue(matrix);
+		}
+		return null;
 	}
 
 	private String condenseOperators(String input) {
@@ -392,7 +439,6 @@ public class Workspace implements Runnable {
 			input = input.replace(matcher.group(), matcher.group().substring(0, 1));
 		}
 		input = input.replaceAll("^\\+", "");
-		System.out.println(input);
 		return input;
 	}
 
