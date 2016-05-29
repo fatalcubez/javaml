@@ -31,7 +31,7 @@ public class WorkspaceFormatter {
 			if(allInt){
 				formattedValue = formattedValue.replace(".0000", "");
 			}
-			return formattedValue;
+			return "\n" + variable + " =\n" + formattedValue;
 			
 		}
 		return "\n" + variable + " =\n\n" + tab + formattedValue + "\n";
