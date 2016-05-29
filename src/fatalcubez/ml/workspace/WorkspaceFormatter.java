@@ -9,6 +9,7 @@ public class WorkspaceFormatter {
 	}
 	
 	public String formatAssignment(String variable, ExpressionValue value){
+		//TODO: Fix spacing for matrices so that all columns line up
 		String formattedValue = "";
 		if(value instanceof ScalarValue){
 			ScalarValue sV = (ScalarValue)value;
