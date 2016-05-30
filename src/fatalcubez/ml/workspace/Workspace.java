@@ -112,25 +112,11 @@ public class Workspace implements Runnable {
 		boolean isFunction = Function.getFunction(left) != null;
 		if (isFunction) throw new WorkspaceInputException("Can't use function name in variable declaration.");
 	}
-
-	// private void checkFunctions(String input){
-	// input = input.replace(" ", "");
-	// String[] words = input.replaceAll("[^A-Za-Z]", " ").split(" ");
-	//
-	// for(int i = 0; i < words.length; i++){
-	// String word = words[i];
-	// if(word.length() == 0) continue;
-	// for(Function func : Function.values()){
-	//
-	// }
-	// }
-	// }
-
+	
 	private void checkStatement(String input) throws WorkspaceInputException {
 		checkParentheses(input);
 		checkBrackets(input);
 		checkAssignment(input);
-		// checkFunctions(input);
 	}
 
 	/**
@@ -143,7 +129,28 @@ public class Workspace implements Runnable {
 	 */
 	private String evaluate(String input, boolean display) throws WorkspaceInputException {
 		String ret = "";
-		input = input.replace(" ", "");
+//		input = input.replace(" ", "");
+		
+		// Get rid of spaces unless they are inside of '[' ']'
+		int opening = 0;
+		String statement = input;
+		for(int i = 0; i < input.length(); i++){
+			char current = input.charAt(i);
+			switch(current){
+			case '[':
+				opening++;
+				break;
+			case ']':
+				opening--;
+				break;
+			case ' ':
+				if(opening == 0){
+					if(i+1 > input.length() - 1) statement = statement.substring(0, i);
+					else statement = statement.substring(0, i) + statement.substring(i+1, statement.length());
+				}
+				break;
+			}
+		}
 
 		// First check to see if there is an assignment operator
 		if (input.indexOf('=') != -1) {
@@ -166,112 +173,6 @@ public class Workspace implements Runnable {
 	}
 
 	private ExpressionValue simplify(String input) throws WorkspaceInputException {
-		// int begin = 0;
-		// int end = 0;
-		// ExpressionValue v1 = null;
-		// ExpressionValue v2 = null;
-		// Operation operation = null;
-		// boolean isNegative = false;
-		// boolean elementWise1 = false;
-		// boolean elementWise2 = false;
-		//
-		// for(int i = 0; i < input.length(); i++){
-		// end = i;
-		// String character = input.substring(i, i+1);
-		// Operation currentOperator = Operation.getOperation(character);
-		//
-		// // If there's a period two cases: part of a decimal number or part of
-		// element-wise operator
-		// if(character.equals(".")){
-		// char c;
-		// try{
-		// c = input.charAt(i + 1);
-		// }catch(IndexOutOfBoundsException e){
-		// throw new
-		// WorkspaceInputException("Can't end statement with a period.");
-		// }
-		// // If the next character is a digit
-		// if(c >= '0' && c <= '9'){
-		// continue;
-		// }
-		// // If the next character is an operator
-		// else if(Operation.getOperation(Character.toString(c)) != null){
-		// elementWise = true;
-		// i++;
-		// end = i;
-		// character = input.substring(i, i+1);
-		// currentOperator = Operation.getOperation(character);
-		// }
-		// else{
-		// throw new
-		// WorkspaceInputException("Invalid character following a period.");
-		// }
-		// }
-		//
-		// // If an operator character is detected
-		// if(currentOperator != null){
-		// // In the case where an operation is present but no initial value has
-		// been found, throw an exception as long as the operation
-		// // isn't a subtraction or addition
-		// if(v1 == null && !(currentOperator.equals(Operation.ADD) ||
-		// currentOperator.equals(Operation.SUBTRACT))){
-		// throw new WorkspaceInputException("Invalid placement of operator: '"
-		// + currentOperator.getConsoleName() + "'.");
-		// }
-		// else if(v1 == null && currentOperator.equals(Operation.ADD)){
-		// continue;
-		// }
-		// else if(v1 == null && currentOperator.equals(Operation.SUBTRACT)){
-		// isNegative = !isNegative;
-		// continue;
-		// }
-		//
-		// // Make sure multiple operators are not placed next to each other
-		// if(operation != null && !(currentOperator.equals(Operation.ADD) ||
-		// currentOperator.equals(Operation.SUBTRACT)) &&
-		// Operation.getOperation(input.substring(i-1, i)) != null){
-		// throw new
-		// WorkspaceInputException("Multiple operators invalidly placed in a row.");
-		// }
-		// else if(operation != null && currentOperator.equals(Operation.ADD)){
-		// continue;
-		// }
-		// else if(operation != null &&
-		// currentOperator.equals(Operation.SUBTRACT)){
-		// isNegative = !isNegative;
-		// continue;
-		// }
-		//
-		// // Two cases at this point:
-		// // 1. v1 and operation both exist, and so v2 must be parsed and
-		// combined
-		// // 2. v1 and operation don't exist, so operation must be equal to
-		// currentOperator and v1 parsed
-		// if(v1 == null && operation == null){
-		// operation = currentOperator;
-		// v1 = parseValue(input.substring(begin, end));
-		// begin = end;
-		// continue;
-		// }
-		// else if(v1 != null && operation != null){
-		// v2 = parseValue(input.substring(begin, end));
-		// v1 = operation.getOperationInstance().evaluate(v1, v2, elementWise);
-		// v2 = null;
-		// operation = currentOperator;
-		// elementWise = false;
-		// begin = end;
-		// continue;
-		// }
-		// else{
-		// throw new WorkspaceInputException("Unknown error....");
-		// }
-		//
-		//
-		// }
-		// }
-		//
-		// return v1;
-
 		int opening = 0;
 		
 		// Looking for + or -
@@ -423,7 +324,7 @@ public class Workspace implements Runnable {
 					opening--;
 					continue;
 				}
-				if(c == ',' && opening == 0){
+				if(c == ',' || c == ' ' && opening == 0){
 					String sub = row.substring(begin, i);
 					if(!sub.isEmpty()) elements.add(sub);
 					begin = i + 1;
