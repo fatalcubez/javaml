@@ -294,8 +294,14 @@ public class Workspace implements Runnable {
 				if (i == 0) {
 					v1 = new ScalarValue(0.0d);
 				}else if(input.charAt(i-1) == '*' || input.charAt(i-1) == '/' || input.charAt(i-1) == '^') {
+					if(i-2 < 0) throw new WorkspaceInputException("Operation missing first term.");
+					if(input.charAt(i-2) == '.') elementWise = true;
 					IOperation op = Operation.getOperation(Character.toString(input.charAt(i-1))).getOperationInstance();
-					return op.evaluate(simplify(input.substring(0, i-1)), simplify(input.substring(i, input.length())), elementWise);
+					if(elementWise){
+						return op.evaluate(simplify(input.substring(0, i-2)), simplify(input.substring(i, input.length())), elementWise);
+					}else{
+						return op.evaluate(simplify(input.substring(0, i-1)), simplify(input.substring(i, input.length())), elementWise);
+					}
 				}
 				else {
 					v1 = elementWise ? simplify(input.substring(0, i - 1)) : simplify(input.substring(0, i));
@@ -378,10 +384,6 @@ public class Workspace implements Runnable {
 	}
 	
 	private MatrixValue parseMatrix(String input) throws WorkspaceInputException{
-//		String[] rows = input.split(";");
-		
-		//TODO: [[1;2],[3;4]] won't work because the split(";") doesn't account for matrices inside of other matrices
-		
 		List<String> rows = new ArrayList<String>();
 		
 		int opening = 0;
