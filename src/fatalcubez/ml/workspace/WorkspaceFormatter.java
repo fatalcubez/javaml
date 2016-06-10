@@ -53,9 +53,6 @@ public class WorkspaceFormatter {
 			if(allInt){
 				formattedValue = formattedValue.replace(".0000", "");
 			}
-			if(biggestNum > 1){
-				
-			}
 			return "\n" + variable + " =\n" + formattedValue;
 			
 		}

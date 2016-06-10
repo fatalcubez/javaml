@@ -44,8 +44,7 @@ public class Workspace implements Runnable {
 	}
 
 	/**
-	 * Takes workspace input and does initial checks on it for immediate errors
-	 * in the input.
+	 * Takes workspace input and does initial checks on it for immediate errors in the input.
 	 * 
 	 * @param input
 	 * @throws WorkspaceInputException
@@ -124,12 +123,10 @@ public class Workspace implements Runnable {
 	 * 
 	 * @param input
 	 *            - String to be evaluated
-	 * @return a formatted string that can be used as output. String returned
-	 *         will be empty if display is set to false
+	 * @return a formatted string that can be used as output. String returned will be empty if display is set to false
 	 */
 	private String evaluate(String input, boolean display) throws WorkspaceInputException {
 		String ret = "";
-		// input = input.replace(" ", "");
 
 		// Get rid of spaces unless they are inside of '[' ']'
 		int opening = 0;
@@ -157,10 +154,7 @@ public class Workspace implements Runnable {
 		// First check to see if there is an assignment operator
 		if (input.indexOf('=') != -1) {
 			String[] sides = input.split("=");
-
-			String left = sides[0]; // left side is the variable name and must
-									// be saved
-
+			String left = sides[0]; // left side is the variable name and must be saved
 			String right = sides[1]; // right side is going to be evaluated
 			ExpressionValue value = simplify(right);
 			workspaceVariables.put(left, value);
@@ -435,9 +429,7 @@ public class Workspace implements Runnable {
 	 * Splits user input into statements based on semicolons and commas.
 	 * 
 	 * @param input
-	 * @return a two object list where the first object in the list is an array
-	 *         of all the statements and the second object is a list of all the
-	 *         boolean values for whether or not each value should be displayed.
+	 * @return a two object list where the first object in the list is an array of all the statements and the second object is a list of all the boolean values for whether or not each value should be displayed.
 	 */
 	private List<Object> getStatements(String input) {
 		input = input.replace(" ", "");
