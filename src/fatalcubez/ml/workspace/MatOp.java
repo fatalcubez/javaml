@@ -218,6 +218,15 @@ public class MatOp {
 		return new MatrixValue(ret);
 	}
 	
+	public static ExpressionValue transpose(ExpressionValue v1){
+		if(v1 instanceof ScalarValue){
+			return (ScalarValue)v1;
+		}
+		MatrixValue mV = (MatrixValue)v1;
+		mV.setMatrix(mV.getMatrix().transpose());
+		return mV;
+	}
+	
 	private static boolean isValidDimensions(MatrixValue v1, MatrixValue v2){
 		return !(v1.getMatrix().getColumnDimension() != v2.getMatrix().getColumnDimension() || v1.getMatrix().getRowDimension() != v2.getMatrix().getRowDimension());
 	}

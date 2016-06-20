@@ -63,7 +63,7 @@ public class Workspace implements Runnable {
 		if (input.charAt(0) == ')' || input.charAt(input.length() - 1) == '(') throw new WorkspaceInputException("Invalid parentheses placement (start/end).");
 
 		// Check to make sure all parenthesis are followed by valid characters
-		String characters = ".^*+-=)";
+		String characters = ".^*+-=)'";
 		Pattern pattern = Pattern.compile("\\)[^" + characters + "]");
 		Matcher matcher = pattern.matcher(input);
 		if (matcher.find()) throw new WorkspaceInputException("Invalid character placement after ')'.");
@@ -87,7 +87,7 @@ public class Workspace implements Runnable {
 		if (input.charAt(0) == ']' || input.charAt(input.length() - 1) == '[') throw new WorkspaceInputException("Invalid bracket placement (start/end).");
 
 		// Check to make sure all brackets are followed by valid characters
-		String characters = ".^*+-=)\\[\\],;";
+		String characters = ".^*+-=)\\[\\],;'";
 		Pattern pattern = Pattern.compile("\\][^" + characters + "]");
 		Matcher matcher = pattern.matcher(input);
 		if (matcher.find()) throw new WorkspaceInputException("Invalid character placement after ']'.");
@@ -130,7 +130,6 @@ public class Workspace implements Runnable {
 
 		// Get rid of spaces unless they are inside of '[' ']'
 		int opening = 0;
-		String statement = input;
 		for (int i = 0; i < input.length(); i++) {
 			char current = input.charAt(i);
 			switch (current) {
@@ -143,9 +142,11 @@ public class Workspace implements Runnable {
 			case ' ':
 				if (opening == 0) {
 					if (i + 1 > input.length() - 1)
-						statement = statement.substring(0, i);
-					else
-						statement = statement.substring(0, i) + statement.substring(i + 1, statement.length());
+						input = input.substring(0, i);
+					else{
+						input = input.substring(0, i) + input.substring(i + 1, input.length());
+						i--;
+					}
 				}
 				break;
 			}
@@ -268,7 +269,13 @@ public class Workspace implements Runnable {
 				return Operation.POWER.getOperationInstance().evaluate(v1, simplify(input.substring(i + 1, input.length())), elementWise);
 			}
 		}
-
+		
+		// Transpose
+		if(input.charAt(input.length()-1) == '\''){
+			if(input.length() == 1) throw new WorkspaceInputException("Invalid use of transpose operation.");
+			return MatOp.transpose(simplify(input.substring(0, input.length()-1)));
+		}
+		
 		if (input.charAt(0) == '(' && input.charAt(input.length() - 1) == ')') {
 			return simplify(input.substring(1, input.length() - 1));
 		}
@@ -379,7 +386,7 @@ public class Workspace implements Runnable {
 		}
 	}
 
-	private String condenseOperators(String input) {
+	private String condenseStatment(String input) {
 		String characters = "[+-]{2,}";
 		Pattern pattern = Pattern.compile(characters);
 		Matcher matcher = pattern.matcher(input);
@@ -398,7 +405,7 @@ public class Workspace implements Runnable {
 		while (matcher.find()) {
 			input = input.replace(matcher.group(), matcher.group().substring(0, 1));
 		}
-		input = input.replaceAll("^\\+", "");
+		input = input.replaceAll("^\\+", "");		
 		return input;
 	}
 
@@ -484,7 +491,7 @@ public class Workspace implements Runnable {
 				for (int i = 0; i < statements.length; i++) {
 					if (statements[i].isEmpty()) continue;
 					checkStatement(statements[i]);
-					statements[i] = condenseOperators(input);
+					statements[i] = condenseStatment(input);
 					String formattedOutput = evaluate(statements[i], displayValues[i]);
 					if (!formattedOutput.isEmpty()) System.out.println(formattedOutput);
 				}
