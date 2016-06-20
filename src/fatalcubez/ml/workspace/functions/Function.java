@@ -14,6 +14,12 @@ public enum Function {
 		public IFunction getFunctionInstance() {
 			return new ZerosFunction();
 		}
+	},
+	ONES("ones"){
+		@Override
+		public IFunction getFunctionInstance() {
+			return new OnesFunction();
+		}
 	};
 	
 	private String consoleName;

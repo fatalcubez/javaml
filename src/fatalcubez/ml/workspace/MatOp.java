@@ -1,6 +1,7 @@
 package fatalcubez.ml.workspace;
 
 import org.apache.commons.math3.linear.MatrixDimensionMismatchException;
+import org.apache.commons.math3.linear.MatrixUtils;
 
 public class MatOp {
 
@@ -137,7 +138,7 @@ public class MatOp {
 	}
 	
 	private static ExpressionValue power(MatrixValue v1, ScalarValue v2) throws WorkspaceInputException{
-		if(v2.getScalar() != Math.floor(v2.getScalar())) throw new WorkspaceInputException("Must use integers when raising a matrix to a power.");
+		if(!isInteger(v2.getScalar())) throw new WorkspaceInputException("Must use integers when raising a matrix to a power.");
 		if(!v1.getMatrix().isSquare()) throw new WorkspaceInputException("Must use a SQUARE matrix as input.");
 		if(v2.getScalar() < 0) throw new WorkspaceInputException("Can't raise matrix to a negative power.");
 		return new MatrixValue(v1.getMatrix().power((int)Math.floor(v2.getScalar())));
@@ -227,7 +228,53 @@ public class MatOp {
 		return mV;
 	}
 	
-	private static boolean isValidDimensions(MatrixValue v1, MatrixValue v2){
+	public static MatrixValue getEyeMatrix(ScalarValue v1)throws WorkspaceInputException{
+		return getEyeMatrix(v1, v1);
+	}
+	
+	public static MatrixValue getEyeMatrix(ScalarValue v1, ScalarValue v2)throws WorkspaceInputException{
+		if(!isInteger(v1.getScalar()) || !isInteger(v2.getScalar())) throw new WorkspaceInputException("Size inputs must be integers.");
+		int rows = (int)v1.getScalar();
+		int cols = (int)v2.getScalar();
+		if(rows <= 0 || cols <= 0) throw new WorkspaceInputException("Size inputs must be greater than 0.");
+		if(rows != cols){
+			return new MatrixValue(MatrixUtils.createRealIdentityMatrix(rows > cols ? rows : cols).getSubMatrix(0, rows-1, 0, cols-1));
+		}
+		else{
+			return new MatrixValue(MatrixUtils.createRealIdentityMatrix(rows));
+		}
+	}
+	
+	public static MatrixValue getZerosMatrix(ScalarValue v1) throws WorkspaceInputException{
+		return getZerosMatrix(v1, v1);
+	}
+	
+	public static MatrixValue getZerosMatrix(ScalarValue v1, ScalarValue v2) throws WorkspaceInputException{
+		if(!isInteger(v1.getScalar()) || !isInteger(v2.getScalar())) throw new WorkspaceInputException("Size inputs must be integers.");
+		int rows = (int)v1.getScalar();
+		int cols = (int)v2.getScalar();
+		if(rows <= 0 || cols <= 0) throw new WorkspaceInputException("Size inputs must be greater than 0.");
+		if(rows != cols){
+			return new MatrixValue(MatrixUtils.createRealMatrix(rows, cols).getSubMatrix(0, rows-1, 0, cols-1));
+		}
+		else{
+			return new MatrixValue(MatrixUtils.createRealMatrix(rows, cols));
+		}
+	}
+	
+	public static MatrixValue getOnesMatrix(ScalarValue v1) throws WorkspaceInputException{
+		return getOnesMatrix(v1, v1);
+	}
+	
+	public static MatrixValue getOnesMatrix(ScalarValue v1, ScalarValue v2) throws WorkspaceInputException{
+		return (MatrixValue)add(getZerosMatrix(v1, v2), new ScalarValue(1.0d));
+	}
+	
+	public static boolean isInteger(double input){
+		return input == Math.floor(input);
+	}
+	
+	public static boolean isValidDimensions(MatrixValue v1, MatrixValue v2){
 		return !(v1.getMatrix().getColumnDimension() != v2.getMatrix().getColumnDimension() || v1.getMatrix().getRowDimension() != v2.getMatrix().getRowDimension());
 	}
 }

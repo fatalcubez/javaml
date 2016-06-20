@@ -12,6 +12,7 @@ import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
 import fatalcubez.ml.workspace.functions.Function;
+import fatalcubez.ml.workspace.functions.IFunction;
 import fatalcubez.ml.workspace.operations.IOperation;
 import fatalcubez.ml.workspace.operations.Operation;
 
@@ -143,7 +144,7 @@ public class Workspace implements Runnable {
 				if (opening == 0) {
 					if (i + 1 > input.length() - 1)
 						input = input.substring(0, i);
-					else{
+					else {
 						input = input.substring(0, i) + input.substring(i + 1, input.length());
 						i--;
 					}
@@ -269,13 +270,53 @@ public class Workspace implements Runnable {
 				return Operation.POWER.getOperationInstance().evaluate(v1, simplify(input.substring(i + 1, input.length())), elementWise);
 			}
 		}
-		
+
 		// Transpose
-		if(input.charAt(input.length()-1) == '\''){
-			if(input.length() == 1) throw new WorkspaceInputException("Invalid use of transpose operation.");
-			return MatOp.transpose(simplify(input.substring(0, input.length()-1)));
+		if (input.charAt(input.length() - 1) == '\'') {
+			if (input.length() == 1) throw new WorkspaceInputException("Invalid use of transpose operation.");
+			return MatOp.transpose(simplify(input.substring(0, input.length() - 1)));
 		}
-		
+
+		// Check for function
+		String characters = "^[a-zA-z]*\\(.*\\)$";
+		Pattern pattern = Pattern.compile(characters);
+		Matcher matcher = pattern.matcher(input);
+		if (matcher.find()) {
+			String name = input.split("\\(")[0];
+			IFunction function = Function.getFunction(name).getFunctionInstance();
+			List<ExpressionValue> params = new ArrayList<ExpressionValue>();
+			characters = "\\(.+\\)";
+			pattern = Pattern.compile(characters);
+			matcher = pattern.matcher(input);
+			int begin = 0;
+			if (matcher.find()){
+				String p = (String)matcher.group().subSequence(1, matcher.group().length() - 1);
+				opening = 0;
+				for(int i = 0; i < p.length(); i++){
+					char character = p.charAt(i);
+					if(character == '(' || character == '['){
+						opening++;
+						continue;
+					}
+					if(character == ')' || character == ']'){
+						opening--;
+						continue;
+					}
+					if(p.charAt(i) == ','){
+						params.add(simplify(p.substring(begin, i)));
+						begin = i + 1;
+					}
+					if(i == p.length() - 1){
+						params.add(simplify(p.substring(begin)));
+						break;
+					}
+				}
+			}else{
+				throw new WorkspaceInputException("No parameters for function " + name + ".");
+			}
+			return function.evaluate(params);
+		}
+
 		if (input.charAt(0) == '(' && input.charAt(input.length() - 1) == ')') {
 			return simplify(input.substring(1, input.length() - 1));
 		}
@@ -405,7 +446,7 @@ public class Workspace implements Runnable {
 		while (matcher.find()) {
 			input = input.replace(matcher.group(), matcher.group().substring(0, 1));
 		}
-		input = input.replaceAll("^\\+", "");		
+		input = input.replaceAll("^\\+", "");
 		return input;
 	}
 
@@ -454,9 +495,11 @@ public class Workspace implements Runnable {
 			}
 			switch (currentChar) {
 			case '[':
+			case '(':
 				opening++;
 				break;
 			case ']':
+			case ')':
 				opening--;
 				break;
 			case ';':

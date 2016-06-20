@@ -14,7 +14,7 @@ public class WorkspaceFormatter {
 		String formattedValue = "";
 		if(value instanceof ScalarValue){
 			ScalarValue sV = (ScalarValue)value;
-			if(sV.getScalar() == Math.floor(sV.getScalar())) formattedValue = "" + (int)sV.getScalar();
+			if(MatOp.isInteger(sV.getScalar())) formattedValue = "" + (int)sV.getScalar();
 			else formattedValue = "" + String.format("%.4f",sV.getScalar());
 		}
 		if(value instanceof MatrixValue){
@@ -28,7 +28,7 @@ public class WorkspaceFormatter {
 				for(int j = 0; j < mV.getMatrix().getColumnDimension(); j++){
 					double doubleValue = mV.getMatrix().getEntry(i, j);
 					int intValue = (int)doubleValue;
-					if(allInt && doubleValue != Math.floor(doubleValue)) allInt = false;
+					if(allInt && !MatOp.isInteger(doubleValue)) allInt = false;
 					int size = ("" + intValue).length();
 					if(intValue == 0 && doubleValue < 0) size++;
 					if(size > biggestNum) biggestNum = size;
