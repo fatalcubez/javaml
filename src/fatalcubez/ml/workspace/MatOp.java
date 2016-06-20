@@ -1,5 +1,6 @@
 package fatalcubez.ml.workspace;
 
+import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.linear.MatrixDimensionMismatchException;
 import org.apache.commons.math3.linear.MatrixUtils;
 
@@ -34,8 +35,8 @@ public class MatOp {
 		try{
 			value = new MatrixValue(v1.getMatrix().multiply(v2.getMatrix()));
 		}
-		catch(MatrixDimensionMismatchException e){
-			throw new WorkspaceInputException("Inner matrix dimensions must agree (" + v1.getMatrix().getColumnDimension() + " != " + v2.getMatrix().getRowDimension() + ").");
+		catch(DimensionMismatchException e){
+			throw new WorkspaceInputException("Inner matrix dimensions must agree.");
 		}
 		return value;
 	}
@@ -224,8 +225,7 @@ public class MatOp {
 			return (ScalarValue)v1;
 		}
 		MatrixValue mV = (MatrixValue)v1;
-		mV.setMatrix(mV.getMatrix().transpose());
-		return mV;
+		return new MatrixValue(mV.getMatrix().transpose());
 	}
 	
 	public static MatrixValue getEyeMatrix(ScalarValue v1)throws WorkspaceInputException{

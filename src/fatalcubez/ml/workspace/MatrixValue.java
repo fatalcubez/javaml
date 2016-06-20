@@ -27,4 +27,8 @@ public class MatrixValue extends ExpressionValue{
 		this.matrix = matrix;
 	}
 	
+	@Override
+	public String toString(){
+		return matrix.getRowDimension() + "," + matrix.getColumnDimension();
+	}
 }
