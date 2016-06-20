@@ -51,9 +51,6 @@ public class Workspace implements Runnable {
 	 * @throws WorkspaceInputException
 	 */
 	private void checkParentheses(String input) throws WorkspaceInputException {
-		// Get rid of spaces
-		input = input.replace(" ", "");
-
 		// Check to see if opening parenthesis count is same as closing
 		int opening = input.length() - input.replace("(", "").length();
 		int closing = input.length() - input.replace(")", "").length();
@@ -64,7 +61,7 @@ public class Workspace implements Runnable {
 		if (input.charAt(0) == ')' || input.charAt(input.length() - 1) == '(') throw new WorkspaceInputException("Invalid parentheses placement (start/end).");
 
 		// Check to make sure all parenthesis are followed by valid characters
-		String characters = ".^*+-=)'";
+		String characters = ".^*+-=)\\]'";
 		Pattern pattern = Pattern.compile("\\)[^" + characters + "]");
 		Matcher matcher = pattern.matcher(input);
 		if (matcher.find()) throw new WorkspaceInputException("Invalid character placement after ')'.");
@@ -76,8 +73,6 @@ public class Workspace implements Runnable {
 	}
 
 	private void checkBrackets(String input) throws WorkspaceInputException {
-		input = input.replace(" ", "");
-
 		// Check to see if opening brackets count is same as closing
 		int opening = input.length() - input.replace("[", "").length();
 		int closing = input.length() - input.replace("]", "").length();
@@ -88,7 +83,7 @@ public class Workspace implements Runnable {
 		if (input.charAt(0) == ']' || input.charAt(input.length() - 1) == '[') throw new WorkspaceInputException("Invalid bracket placement (start/end).");
 
 		// Check to make sure all brackets are followed by valid characters
-		String characters = ".^*+-=)\\[\\],;'";
+		String characters = ".^*+-=)\\[\\],;'\\s";
 		Pattern pattern = Pattern.compile("\\][^" + characters + "]");
 		Matcher matcher = pattern.matcher(input);
 		if (matcher.find()) throw new WorkspaceInputException("Invalid character placement after ']'.");
@@ -100,7 +95,6 @@ public class Workspace implements Runnable {
 	}
 
 	private void checkAssignment(String input) throws WorkspaceInputException {
-		input = input.replace(" ", "");
 		if (!input.contains("=")) return;
 		if (input.split("=").length > 2) throw new WorkspaceInputException("Too many assignment operators ('=').");
 		String[] sides = input.split("=");
@@ -451,19 +445,6 @@ public class Workspace implements Runnable {
 	}
 
 	private ExpressionValue parseValue(String input) throws WorkspaceInputException {
-		// String patternCharacters = "^[A-Za-z][A-Za-z0-9_]*$";
-		// Pattern pattern = Pattern.compile(patternCharacters);
-		// Matcher matcher = pattern.matcher(input);
-		// if (!matcher.find()) throw new
-		// WorkspaceInputException("Following statement can't be parsed: '" +
-		// input + "'.");
-		// if(workspaceVariables.containsKey(input)) return
-		// workspaceVariables.get(input);
-		// try{
-		// double value = Double.parseDouble(input);
-		// }catch(Exception e){
-		// throw new WorkspaceInputException("Can't parse ")
-		// }
 		if (workspaceVariables.containsKey(input)) return workspaceVariables.get(input);
 		String patternCharacters = "[^0-9.-]";
 		Pattern pattern = Pattern.compile(patternCharacters);
@@ -480,8 +461,31 @@ public class Workspace implements Runnable {
 	 * @return a two object list where the first object in the list is an array of all the statements and the second object is a list of all the boolean values for whether or not each value should be displayed.
 	 */
 	private List<Object> getStatements(String input) {
-		input = input.replace(" ", "");
+		// Get rid of spaces
 		int opening = 0;
+		for (int i = 0; i < input.length(); i++) {
+			char current = input.charAt(i);
+			switch (current) {
+			case '[':
+				opening++;
+				break;
+			case ']':
+				opening--;
+				break;
+			case ' ':
+				if (opening == 0) {
+					if (i + 1 > input.length() - 1)
+						input = input.substring(0, i);
+					else {
+						input = input.substring(0, i) + input.substring(i + 1, input.length());
+						i--;
+					}
+				}
+				break;
+			}
+		}
+		
+		opening = 0;
 		List<String> statements = new ArrayList<String>();
 		List<Boolean> displayList = new ArrayList<Boolean>();
 		int begin = 0;
