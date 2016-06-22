@@ -1,0 +1,8 @@
+Need to Add:
+-Functions -> sin, cos, tan, log, exp, sum, mean, svd, size
+-Loading from file
+-
+
+Want to Add:
+-bsxfun
+-magic
