@@ -2,6 +2,10 @@ package fatalcubez.ml.workspace;
 
 public class ScalarValue extends ExpressionValue {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8653433352329730574L;
 	private double scalar;
 
 	public ScalarValue(){

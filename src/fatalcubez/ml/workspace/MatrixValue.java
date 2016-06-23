@@ -5,6 +5,10 @@ import org.apache.commons.math3.linear.RealMatrix;
 
 public class MatrixValue extends ExpressionValue{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4231050452116360135L;
 	private RealMatrix matrix;
 	
 	public MatrixValue(){
