@@ -7,6 +7,7 @@ import org.apache.commons.math3.linear.MatrixUtils;
 public class MatOp {
 
 	public static ExpressionValue multiply(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException{
+		if(isStringArgument(v1) || isStringArgument(v2)) throw new WorkspaceInputException("Can't operate with string values.");
 		if (v1 instanceof ScalarValue && v2 instanceof ScalarValue) {
 			return multiply((ScalarValue)v1, (ScalarValue)v2);
 		}
@@ -42,6 +43,7 @@ public class MatOp {
 	}
 	
 	public static ExpressionValue divide(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException{
+		if(isStringArgument(v1) || isStringArgument(v2)) throw new WorkspaceInputException("Can't operate with string values.");
 		if (v1 instanceof ScalarValue && v2 instanceof ScalarValue) {
 			return multiply((ScalarValue)v1, (ScalarValue)reciprocal(v2));
 		}
@@ -57,7 +59,8 @@ public class MatOp {
 		return null;
 	}
 	
-	public static ExpressionValue reciprocal(ExpressionValue v1){
+	public static ExpressionValue reciprocal(ExpressionValue v1)throws WorkspaceInputException{
+		if(isStringArgument(v1)) throw new WorkspaceInputException("Can't operate with string values.");
 		if(v1 instanceof ScalarValue){
 			ScalarValue sV = (ScalarValue)v1;
 			sV.setScalar(1.0d / sV.getScalar());
@@ -76,6 +79,7 @@ public class MatOp {
 	}
 	
 	public static ExpressionValue add(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException {
+		if(isStringArgument(v1) || isStringArgument(v2)) throw new WorkspaceInputException("Can't operate with string values.");
 		if (v1 instanceof ScalarValue && v2 instanceof ScalarValue) {
 			return add((ScalarValue)v1, (ScalarValue)v2);
 		}
@@ -125,6 +129,7 @@ public class MatOp {
 	 * @throws WorkspaceInputException
 	 */
 	public static ExpressionValue power(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException{
+		if(isStringArgument(v1) || isStringArgument(v2)) throw new WorkspaceInputException("Can't operate with string values.");
 		if(v1 instanceof ScalarValue && v2 instanceof ScalarValue){
 			return power((ScalarValue)v1, (ScalarValue)v2);
 		}
@@ -172,6 +177,7 @@ public class MatOp {
 	}
 
 	public static ExpressionValue elementWisePower(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException{
+		if(isStringArgument(v1) || isStringArgument(v2)) throw new WorkspaceInputException("Can't operate with string values.");
 		if (v1 instanceof ScalarValue && v2 instanceof ScalarValue) {
 			return power(v1, v2);
 		}
@@ -220,7 +226,8 @@ public class MatOp {
 		return new MatrixValue(ret);
 	}
 	
-	public static ExpressionValue transpose(ExpressionValue v1){
+	public static ExpressionValue transpose(ExpressionValue v1) throws WorkspaceInputException{
+		if(isStringArgument(v1)) throw new WorkspaceInputException("Can't operate with string values.");
 		if(v1 instanceof ScalarValue){
 			return (ScalarValue)v1;
 		}
@@ -276,5 +283,9 @@ public class MatOp {
 	
 	public static boolean isValidDimensions(MatrixValue v1, MatrixValue v2){
 		return !(v1.getMatrix().getColumnDimension() != v2.getMatrix().getColumnDimension() || v1.getMatrix().getRowDimension() != v2.getMatrix().getRowDimension());
+	}
+	
+	public static boolean isStringArgument(ExpressionValue v1){
+		return v1 instanceof StringValue;
 	}
 }
