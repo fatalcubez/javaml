@@ -345,7 +345,7 @@ public class MatOp {
 	}
 
 	public static boolean areEqualDimensions(MatrixValue v1, MatrixValue v2) {
-		return v1.getCols() == v2.getCols() || v1.getRows() == v2.getRows();
+		return v1.getCols() == v2.getCols() && v1.getRows() == v2.getRows();
 	}
 
 	public static boolean isStringArgument(ExpressionValue v1) {

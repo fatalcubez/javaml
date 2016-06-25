@@ -275,7 +275,7 @@ public class Workspace implements Runnable {
 		}
 
 		// Check for function
-		String characters = "^[a-zA-z]*\\(.*\\)$";
+		String characters = "^[a-zA-z]+\\(.*\\)$";
 		Pattern pattern = Pattern.compile(characters);
 		Matcher matcher = pattern.matcher(input);
 		if (matcher.find()) {
