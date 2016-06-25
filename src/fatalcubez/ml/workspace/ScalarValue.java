@@ -1,16 +1,12 @@
 package fatalcubez.ml.workspace;
 
-public class ScalarValue extends ExpressionValue {
+public final class ScalarValue extends ExpressionValue {
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -8653433352329730574L;
-	private double scalar;
-
-	public ScalarValue(){
-		scalar = 0d;
-	}
+	private final double scalar;
 	
 	public ScalarValue(double scalar){
 		this.scalar = scalar;
@@ -19,10 +15,4 @@ public class ScalarValue extends ExpressionValue {
 	public double getScalar() {
 		return scalar;
 	}
-
-	public void setScalar(double scalar) {
-		this.scalar = scalar;
-	}
-	
-
 }

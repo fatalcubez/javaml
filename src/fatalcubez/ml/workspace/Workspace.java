@@ -291,6 +291,10 @@ public class Workspace implements Runnable {
 				opening = 0;
 				for(int i = 0; i < p.length(); i++){
 					char character = p.charAt(i);
+					if(i == p.length() - 1){
+						params.add(simplify(p.substring(begin)));
+						break;
+					}
 					if(character == '(' || character == '['){
 						opening++;
 						continue;
@@ -299,13 +303,9 @@ public class Workspace implements Runnable {
 						opening--;
 						continue;
 					}
-					if(p.charAt(i) == ','){
+					if(p.charAt(i) == ',' && opening == 0){
 						params.add(simplify(p.substring(begin, i)));
 						begin = i + 1;
-					}
-					if(i == p.length() - 1){
-						params.add(simplify(p.substring(begin)));
-						break;
 					}
 				}
 			}else{

@@ -10,7 +10,8 @@ public class MeanFunction implements IFunction{
 
 	@Override
 	public ExpressionValue evaluate(List<ExpressionValue> params) throws WorkspaceInputException {
-		if(params.size() > 2) throw new WorkspaceInputException("Too many arguments for function 'sum'.");
+		if(params.size() > 2) throw new WorkspaceInputException("Too many arguments for function 'mean'.");
+		if(params.size() <= 0) throw new WorkspaceInputException("Too little arguments for function 'mean'.");
 		if(params.size() == 1){
 			return MatOp.mean(params.get(0));
 		}
