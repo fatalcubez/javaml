@@ -11,6 +11,7 @@ public class MatrixValue extends ExpressionValue{
 	private static final long serialVersionUID = -4231050452116360135L;
 	private RealMatrix matrix;
 	
+	// TODO: Consider defensive copying
 	public MatrixValue(){
 		matrix = new Array2DRowRealMatrix();
 	}

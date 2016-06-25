@@ -1,8 +1,10 @@
 package fatalcubez.ml.workspace;
 
 import org.apache.commons.math3.exception.DimensionMismatchException;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.MatrixDimensionMismatchException;
 import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.linear.RealMatrix;
 
 public class MatOp {
 
@@ -235,6 +237,94 @@ public class MatOp {
 		return new MatrixValue(mV.getMatrix().transpose());
 	}
 	
+	public static ExpressionValue sum(ExpressionValue v1) throws WorkspaceInputException{
+		if(v1 instanceof MatrixValue){
+			MatrixValue mV = (MatrixValue)v1;
+			if(mV.getMatrix().getRowDimension() == 1){
+				double sum = 0;
+				for(int i = 0; i < mV.getMatrix().getColumnDimension(); i++){
+					sum += mV.getMatrix().getEntry(0, i);
+				}
+				return new ScalarValue(sum);
+			}
+		}
+		return sum(v1, new ScalarValue(1.0d));
+	}
+	
+	public static ExpressionValue sum(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException{
+		if(!(v2 instanceof ScalarValue)) throw new WorkspaceInputException("Invalid dimension argument.");
+		ScalarValue sV = (ScalarValue)v2;
+		if(!isInteger(sV.getScalar()) || !inRange(sV.getScalar(), 1.0d, 2.0d)) throw new WorkspaceInputException("Invalid dimension argument.");
+		if(v1 instanceof MatrixValue){
+			MatrixValue mV = (MatrixValue)v1;
+			int rows = mV.getMatrix().getRowDimension();
+			int cols = mV.getMatrix().getColumnDimension();
+			// Summing across the 1st dimension (rows)
+			if(Double.compare(1.0d, sV.getScalar()) == 0){
+				RealMatrix mat = new Array2DRowRealMatrix(1, cols);
+				for(int i = 0; i < rows; i++){
+					mat = mat.add(mV.getMatrix().getRowMatrix(i));
+				}
+				return cols == 1 ? new ScalarValue(mat.getEntry(0, 0)) : new MatrixValue(mat);
+			}
+			else{
+				RealMatrix mat = new Array2DRowRealMatrix(rows, 1);
+				for(int i = 0; i < cols; i++){
+					mat = mat.add(mV.getMatrix().getColumnMatrix(i));
+				}
+				return rows == 1 ? new ScalarValue(mat.getEntry(0, 0)) : new MatrixValue(mat);
+			}
+		}
+		else if(v1 instanceof ScalarValue){
+			return new ScalarValue(((ScalarValue) v1).getScalar());
+		}
+		else{
+			throw new WorkspaceInputException("Invalid input value.");
+		}
+	}
+	
+	public static ExpressionValue mean(ExpressionValue v1) throws WorkspaceInputException{
+		if(v1 instanceof MatrixValue){
+			MatrixValue mV = (MatrixValue)v1;
+			if(mV.getMatrix().getRowDimension() == 1){
+				return new ScalarValue(((ScalarValue)sum(mV)).getScalar() / mV.getMatrix().getColumnDimension());
+			}
+		}
+		return mean(v1, new ScalarValue(1.0d));
+	}
+	
+	public static ExpressionValue mean(ExpressionValue v1, ExpressionValue v2)throws WorkspaceInputException{
+		if(!(v2 instanceof ScalarValue)) throw new WorkspaceInputException("Invalid dimension argument.");
+		ScalarValue sV = (ScalarValue)v2;
+		if(!isInteger(sV.getScalar()) || !inRange(sV.getScalar(), 1.0d, 2.0d)) throw new WorkspaceInputException("Invalid dimension argument.");
+		if(v1 instanceof MatrixValue){
+			MatrixValue mV = (MatrixValue)v1;
+			int rows = mV.getMatrix().getRowDimension();
+			int cols = mV.getMatrix().getColumnDimension();
+			// Summing across the 1st dimension (rows)
+			if(Double.compare(1.0d, sV.getScalar()) == 0){
+				RealMatrix mat = new Array2DRowRealMatrix(1, cols);
+				for(int i = 0; i < rows; i++){
+					mat = mat.add(mV.getMatrix().getRowMatrix(i));
+				}
+				return cols == 1 ? new ScalarValue(mat.getEntry(0, 0) / (double)rows) : new MatrixValue(mat.scalarMultiply(1.0d / (double)rows));
+			}
+			else{
+				RealMatrix mat = new Array2DRowRealMatrix(rows, 1);
+				for(int i = 0; i < cols; i++){
+					mat = mat.add(mV.getMatrix().getColumnMatrix(i));
+				}
+				return rows == 1 ? new ScalarValue(mat.getEntry(0, 0) / (double)cols) : new MatrixValue(mat.scalarMultiply(1.0d / (double)cols));
+			}
+		}
+		else if(v1 instanceof ScalarValue){
+			return new ScalarValue(((ScalarValue) v1).getScalar());
+		}
+		else{
+			throw new WorkspaceInputException("Invalid input value.");
+		}
+	}
+	
 	public static MatrixValue getEyeMatrix(ScalarValue v1)throws WorkspaceInputException{
 		return getEyeMatrix(v1, v1);
 	}
@@ -287,5 +377,17 @@ public class MatOp {
 	
 	public static boolean isStringArgument(ExpressionValue v1){
 		return v1 instanceof StringValue;
+	}
+	
+	/**
+	 * Returns true if the value is greater than or equal to the lower limit and less than or equal to the upper limit.
+	 * 
+	 * @param value
+	 * @param lower
+	 * @param upper
+	 * @return
+	 */
+	public static boolean inRange(double value, double lower, double upper){
+		return value >= lower && value <= upper;
 	}
 }

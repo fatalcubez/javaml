@@ -20,6 +20,18 @@ public enum Function {
 		public IFunction getFunctionInstance() {
 			return new OnesFunction();
 		}
+	},
+	SUM("sum"){
+		@Override
+		public IFunction getFunctionInstance() {
+			return new SumFunction();
+		}
+	},
+	MEAN("mean"){
+		@Override
+		public IFunction getFunctionInstance() {
+			return new MeanFunction();
+		}
 	};
 	
 	private String consoleName;
