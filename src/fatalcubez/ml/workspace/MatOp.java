@@ -1,8 +1,9 @@
 package fatalcubez.ml.workspace;
 
-import org.apache.commons.math3.exception.DimensionMismatchException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.MatrixDimensionMismatchException;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
@@ -329,6 +330,50 @@ public class MatOp {
 			return new MatrixValue(MatrixUtils.createRealMatrix(rows, cols).getSubMatrix(0, rows - 1, 0, cols - 1));
 		} else {
 			return new MatrixValue(MatrixUtils.createRealMatrix(rows, cols));
+		}
+	}
+	
+	// TODO: Handle empty matrices
+	public static MatrixValue createVector(List<ExpressionValue> params) throws WorkspaceInputException{
+		if(params.size() <= 1) throw new WorkspaceInputException("Invalid parameters for ':' operator.");
+		for(ExpressionValue e : params){
+			if(e instanceof StringValue) throw new WorkspaceInputException("Invalid string value for ':' operator.");
+		}
+		if(params.size() == 2){
+			ExpressionValue startValue = params.get(0);
+			ExpressionValue endValue = params.get(1);
+			double start = (startValue instanceof ScalarValue) ? ((ScalarValue)startValue).getScalar() : ((MatrixValue)startValue).getEntry(0, 0);
+			double end = (endValue instanceof ScalarValue) ? ((ScalarValue)endValue).getScalar() : ((MatrixValue)endValue).getEntry(0, 0);
+			if(end - start < 0) throw new WorkspaceInputException("Empty matrix created.");
+			int numElements = (int)(end - start + 1);
+			RealMatrix mat = new Array2DRowRealMatrix(1, numElements);
+			for(int i = 0; i < numElements; i++){
+				mat.setEntry(0, i, i + start);
+			}
+			return new MatrixValue(mat);
+		}
+		else if(params.size() == 3){
+			ExpressionValue startValue = params.get(0);
+			ExpressionValue incrementValue = params.get(1);
+			ExpressionValue endValue = params.get(2);
+			double start = (startValue instanceof ScalarValue) ? ((ScalarValue)startValue).getScalar() : ((MatrixValue)startValue).getEntry(0, 0);
+			double increment = (incrementValue instanceof ScalarValue) ? ((ScalarValue)incrementValue).getScalar() : ((MatrixValue)incrementValue).getEntry(0, 0);
+			double end = (endValue instanceof ScalarValue) ? ((ScalarValue)endValue).getScalar() : ((MatrixValue)endValue).getEntry(0, 0);
+			if(Double.compare(increment, 0.0d) == 0) throw new WorkspaceInputException("Empty matrix created."); 
+			if((end - start < 0 && increment > 0) || (start - end < 0 && increment < 0)) throw new WorkspaceInputException("Empty matrix created.");
+			int numElements = (int)((end - start) / increment + 1);
+			RealMatrix mat = new Array2DRowRealMatrix(1, numElements);
+			for(int i = 0; i < numElements; i++){
+				mat.setEntry(0, i, i * increment + start);
+			}
+			return new MatrixValue(mat);
+		}
+		else{
+			ExpressionValue e = createVector(params.subList(0, 3));
+			List<ExpressionValue> rest = new ArrayList<ExpressionValue>();
+			rest.add(e);
+			rest.addAll(params.subList(3, params.size()));
+			return createVector(rest);
 		}
 	}
 

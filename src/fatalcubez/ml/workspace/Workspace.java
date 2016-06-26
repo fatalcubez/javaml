@@ -169,6 +169,36 @@ public class Workspace implements Runnable {
 		}
 		int opening = 0;
 
+		// Looking for :
+		List<ExpressionValue> list = new ArrayList<ExpressionValue>();
+		int begin = 0;
+		for(int i = 0; i < input.length(); i++){
+			char current = input.charAt(i);
+			if(i == input.length() - 1 && list.size() > 0){
+				list.add(simplify(input.substring(begin)));
+				continue;
+			}
+			if (current == '(' || current == '[') {
+				opening++;
+				continue;
+			}
+			if (current == ')' || current == ']') {
+				opening--;
+				continue;
+			}
+			// Split
+			if(opening == 0 && current == ':'){
+				if(input.substring(begin, i).isEmpty()) throw new WorkspaceInputException("Invalid use of ':' operator.");
+				list.add(simplify(input.substring(begin, i)));
+				begin = i + 1;
+			}
+		}
+		if(!list.isEmpty()){
+			return MatOp.createVector(list);
+		}
+		
+		opening = 0;
+		
 		// Looking for + or -
 		for (int i = input.length() - 1; i >= 0; i--) {
 			char current = input.charAt(i);
@@ -285,7 +315,7 @@ public class Workspace implements Runnable {
 			characters = "\\(.+\\)";
 			pattern = Pattern.compile(characters);
 			matcher = pattern.matcher(input);
-			int begin = 0;
+			begin = 0;
 			if (matcher.find()){
 				String p = (String)matcher.group().subSequence(1, matcher.group().length() - 1);
 				opening = 0;
