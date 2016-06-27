@@ -376,6 +376,17 @@ public class MatOp {
 			return createVector(rest);
 		}
 	}
+	
+	public static ExpressionValue index(ExpressionValue value, List<ExpressionValue> params) {
+		// Linear indexing
+		if(params.size() == 1){
+			
+		}
+		else{
+			
+		}
+		return null;
+	}
 
 	public static MatrixValue getOnesMatrix(ScalarValue v1) throws WorkspaceInputException {
 		return getOnesMatrix(v1, v1);
@@ -408,4 +419,5 @@ public class MatOp {
 	public static boolean inRange(double value, double lower, double upper) {
 		return value >= lower && value <= upper;
 	}
+
 }

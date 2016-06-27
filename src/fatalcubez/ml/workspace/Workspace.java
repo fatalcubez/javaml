@@ -304,13 +304,18 @@ public class Workspace implements Runnable {
 			return MatOp.transpose(simplify(input.substring(0, input.length() - 1)));
 		}
 
-		// Check for function
+		// Check for function or indexing
 		String characters = "^[a-zA-z]+\\(.*\\)$";
 		Pattern pattern = Pattern.compile(characters);
 		Matcher matcher = pattern.matcher(input);
+		// Either function -> ex. sum(...) or indexing -> ex. A(...)
 		if (matcher.find()) {
 			String name = input.split("\\(")[0];
 			IFunction function = Function.getFunction(name).getFunctionInstance();
+			boolean isFunction = function != null;
+			if(!isFunction && !workspaceVariables.containsKey(name)) throw new WorkspaceInputException("Undefined function or variable '" + name + "'.");
+			ExpressionValue value = null;
+			if(!isFunction) value = workspaceVariables.get(name);
 			List<ExpressionValue> params = new ArrayList<ExpressionValue>();
 			characters = "\\(.+\\)";
 			pattern = Pattern.compile(characters);
@@ -321,9 +326,20 @@ public class Workspace implements Runnable {
 				opening = 0;
 				for(int i = 0; i < p.length(); i++){
 					char character = p.charAt(i);
-					if(i == p.length() - 1){
-						params.add(simplify(p.substring(begin)));
-						break;
+					if((p.charAt(i) == ',' && opening == 0) || i == p.length() - 1){
+						// If its not a function, have to handle ':' and special 'end' keyword
+						String str = i == p.length() - 1 ? p.substring(begin, i) : p.substring(begin, i);
+						if(!isFunction){
+							if(str.length() == 1 && str.charAt(0) == ':'){
+								str = "1:" + (value instanceof ScalarValue ? "1" : "" + (((MatrixValue)value).getRows() * ((MatrixValue)value).getCols()));
+							}else{								
+								str = str.replace("end", value instanceof ScalarValue ? "1" : "" + (((MatrixValue)value).getRows() * ((MatrixValue)value).getCols()));
+							}
+						}else{
+							params.add(simplify(p.substring(begin, i)));
+						}
+						begin = i + 1;
+						continue;
 					}
 					if(character == '(' || character == '['){
 						opening++;
@@ -333,15 +349,12 @@ public class Workspace implements Runnable {
 						opening--;
 						continue;
 					}
-					if(p.charAt(i) == ',' && opening == 0){
-						params.add(simplify(p.substring(begin, i)));
-						begin = i + 1;
-					}
 				}
 			}else{
-				throw new WorkspaceInputException("No parameters for function " + name + ".");
+				if(isFunction) throw new WorkspaceInputException("No parameters for function " + name + ".");
+				else throw new WorkspaceInputException("No parameters for indexing.");
 			}
-			return function.evaluate(params);
+			return isFunction ? function.evaluate(params) : MatOp.index(value, params);
 		}
 
 		if (input.charAt(0) == '(' && input.charAt(input.length() - 1) == ')') {
@@ -571,7 +584,7 @@ public class Workspace implements Runnable {
 				for (int i = 0; i < statements.length; i++) {
 					if (statements[i].isEmpty()) continue;
 					checkStatement(statements[i]);
-					statements[i] = condenseStatment(input);
+					statements[i] = condenseStatment(statements[i]);
 					String formattedOutput = evaluate(statements[i], displayValues[i]);
 					if (!formattedOutput.isEmpty()) System.out.println(formattedOutput);
 				}
