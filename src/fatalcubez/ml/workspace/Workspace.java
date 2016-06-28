@@ -328,15 +328,16 @@ public class Workspace implements Runnable {
 					char character = p.charAt(i);
 					if((p.charAt(i) == ',' && opening == 0) || i == p.length() - 1){
 						// If its not a function, have to handle ':' and special 'end' keyword
-						String str = i == p.length() - 1 ? p.substring(begin, i) : p.substring(begin, i);
+						String str = i == p.length() - 1 ? p.substring(begin) : p.substring(begin, i);
 						if(!isFunction){
 							if(str.length() == 1 && str.charAt(0) == ':'){
 								str = "1:" + (value instanceof ScalarValue ? "1" : "" + (((MatrixValue)value).getRows() * ((MatrixValue)value).getCols()));
 							}else{								
+								// TODO: handle linear indexing vs. two-dimensional
 								str = str.replace("end", value instanceof ScalarValue ? "1" : "" + (((MatrixValue)value).getRows() * ((MatrixValue)value).getCols()));
 							}
 						}else{
-							params.add(simplify(p.substring(begin, i)));
+							params.add(simplify(str));
 						}
 						begin = i + 1;
 						continue;
