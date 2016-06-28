@@ -66,7 +66,7 @@ public class Workspace implements Runnable {
 		Matcher matcher = pattern.matcher(input);
 		if (matcher.find()) throw new WorkspaceInputException("Invalid character placement after ')'.");
 
-		String characterPattern = "\\([^a-zA-Z0-9\\+\\-(\\[]";
+		String characterPattern = "\\([^a-zA-Z0-9\\+\\-()\\[.]";
 		pattern = Pattern.compile(characterPattern);
 		matcher = pattern.matcher(input);
 		if (matcher.find()) throw new WorkspaceInputException("Invalid character placement after '('.");
@@ -88,7 +88,7 @@ public class Workspace implements Runnable {
 		Matcher matcher = pattern.matcher(input);
 		if (matcher.find()) throw new WorkspaceInputException("Invalid character placement after ']'.");
 
-		String characterPattern = "\\[[^a-zA-Z0-9(\\[]";
+		String characterPattern = "\\[[^a-zA-Z0-9(\\[.]";
 		pattern = Pattern.compile(characterPattern);
 		matcher = pattern.matcher(input);
 		if (matcher.find()) throw new WorkspaceInputException("Invalid character placement after '['.");
@@ -311,11 +311,13 @@ public class Workspace implements Runnable {
 		// Either function -> ex. sum(...) or indexing -> ex. A(...)
 		if (matcher.find()) {
 			String name = input.split("\\(")[0];
-			IFunction function = Function.getFunction(name).getFunctionInstance();
-			boolean isFunction = function != null;
+			Function func = Function.getFunction(name);
+			IFunction function = null;
+			boolean isFunction = func != null;
 			if(!isFunction && !workspaceVariables.containsKey(name)) throw new WorkspaceInputException("Undefined function or variable '" + name + "'.");
 			ExpressionValue value = null;
 			if(!isFunction) value = workspaceVariables.get(name);
+			else function = func.getFunctionInstance();
 			List<ExpressionValue> params = new ArrayList<ExpressionValue>();
 			characters = "\\(.+\\)";
 			pattern = Pattern.compile(characters);
@@ -351,9 +353,8 @@ public class Workspace implements Runnable {
 									str = str.replace("end", "" + value.getMaxIndex());
 								}
 							}
-						}else{
-							params.add(simplify(str));
 						}
+						params.add(simplify(str));
 						begin = i + 1;
 						continue;
 					}
@@ -368,7 +369,6 @@ public class Workspace implements Runnable {
 				}
 			}else{
 				if(isFunction) throw new WorkspaceInputException("No parameters for function " + name + ".");
-				else throw new WorkspaceInputException("No parameters for indexing.");
 			}
 			return isFunction ? function.evaluate(params) : MatOp.index(value, params);
 		}

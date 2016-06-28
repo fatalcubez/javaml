@@ -26,4 +26,9 @@ public class StringValue implements ExpressionValue{
 		if(index > getMaxIndex() - 1) throw new IllegalArgumentException("Index out of range.");
 		return (double)value.charAt(index);
 	}
+
+	@Override
+	public Dimension getDimension() {
+		return new Dimension(1, getMaxIndex());
+	}
 }

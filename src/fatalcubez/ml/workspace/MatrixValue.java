@@ -48,6 +48,11 @@ public final class MatrixValue implements ExpressionValue{
 	@Override
 	public double getValue(int index) {
 		if(index > getMaxIndex() - 1) throw new IllegalArgumentException("Index out of range.");
-		return getEntry(index % getRows(), index / getCols());
+		return getEntry(index % getRows(), index / getRows());
+	}
+
+	@Override
+	public Dimension getDimension() {
+		return new Dimension(getRows(), getCols());
 	}
 }

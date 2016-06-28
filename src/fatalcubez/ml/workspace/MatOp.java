@@ -377,10 +377,25 @@ public class MatOp {
 		}
 	}
 	
-	public static ExpressionValue index(ExpressionValue value, List<ExpressionValue> params) {
+	public static ExpressionValue index(ExpressionValue value, List<ExpressionValue> params) throws WorkspaceInputException{
+		if(params.size() > 2) throw new WorkspaceInputException("Too many parameters for indexing expression.");
+		if(params.isEmpty()) return value;
+		// Make sure indices are positive integers
+		for(ExpressionValue e : params){
+			if(!isInteger(e)) throw new WorkspaceInputException("Indices must be positive integers.");
+			if(!inRange(e, 0, value.getMaxIndex())) throw new WorkspaceInputException("Index out of range.");
+		}
 		// Linear indexing
 		if(params.size() == 1){
-			
+			ExpressionValue v1 = params.get(0);
+			if(v1.getMaxIndex() == 1) return new ScalarValue(value.getValue(0));
+			RealMatrix mat = new Array2DRowRealMatrix(v1.getDimension().getRows(), v1.getDimension().getCols());
+			for(int i = 0; i < mat.getRowDimension(); i++){
+				for(int j = 0; j < mat.getColumnDimension(); j++){
+					mat.setEntry(i, j, value.getValue((int)(v1.getValue(v1.getDimension().getRows() * j + i) - 1)));
+				}
+			}
+			return new MatrixValue(mat);
 		}
 		else{
 			
@@ -396,6 +411,14 @@ public class MatOp {
 		return (MatrixValue) add(getZerosMatrix(v1, v2), new ScalarValue(1.0d));
 	}
 
+	public static boolean isInteger(ExpressionValue v1){
+		for(int i = 0; i < v1.getMaxIndex(); i++){
+			double value = v1.getValue(i);
+			if(!isInteger(value)) return false;
+		}
+		return true;
+	}
+	
 	public static boolean isInteger(double input) {
 		return input == Math.floor(input);
 	}
@@ -418,6 +441,14 @@ public class MatOp {
 	 */
 	public static boolean inRange(double value, double lower, double upper) {
 		return value >= lower && value <= upper;
+	}
+	
+	public static boolean inRange(ExpressionValue v1, double lower, double upper){
+		for(int i = 0; i < v1.getMaxIndex(); i++){
+			double value = v1.getValue(i);
+			if(value < lower || value > upper) return false;
+		}
+		return true;
 	}
 
 }

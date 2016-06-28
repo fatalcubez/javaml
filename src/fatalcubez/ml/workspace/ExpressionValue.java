@@ -6,5 +6,6 @@ public interface ExpressionValue extends Serializable{
 
 	public int getMaxIndex();
 	public double getValue(int index);
+	public Dimension getDimension();
 
 }

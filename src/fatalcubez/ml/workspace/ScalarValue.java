@@ -26,4 +26,9 @@ public final class ScalarValue implements ExpressionValue {
 		if(index > getMaxIndex() - 1) throw new IllegalArgumentException("Index out of range.");
 		return scalar;
 	}
+
+	@Override
+	public Dimension getDimension() {
+		return new Dimension(1,1);
+	}
 }
