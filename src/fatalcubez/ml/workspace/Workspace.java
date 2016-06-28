@@ -628,7 +628,7 @@ public class Workspace implements Runnable {
 		}
 		List<Object> ret = new ArrayList<Object>();
 		ret.add(statements.toArray(new String[0]));
-		ret.add(displayList.toArray(new Boolean[0]));
+		ret.add(displayList.toArray(new Boolean[0]));		
 		return ret;
 	}
 

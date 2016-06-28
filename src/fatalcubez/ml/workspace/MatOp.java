@@ -385,7 +385,7 @@ public class MatOp {
 			ExpressionValue v1 = params.get(0);
 			if(!isInteger(v1)) throw new WorkspaceInputException("Indices must be positive integers.");
 			if(!inRange(v1, 0, value.getMaxIndex())) throw new WorkspaceInputException("Index out of range.");
-			if(v1.getMaxIndex() == 1) return new ScalarValue(value.getValue(0));
+			if(value.getMaxIndex() == 1) return new ScalarValue(value.getValue(0));
 			RealMatrix mat = new Array2DRowRealMatrix(v1.getDimension().getRows(), v1.getDimension().getCols());
 			for(int i = 0; i < mat.getRowDimension(); i++){
 				for(int j = 0; j < mat.getColumnDimension(); j++){
