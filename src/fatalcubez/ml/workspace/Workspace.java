@@ -45,7 +45,8 @@ public class Workspace implements Runnable {
 	}
 
 	/**
-	 * Takes workspace input and does initial checks on it for immediate errors in the input.
+	 * Takes workspace input and does initial checks on it for immediate errors
+	 * in the input.
 	 * 
 	 * @param input
 	 * @throws WorkspaceInputException
@@ -54,57 +55,71 @@ public class Workspace implements Runnable {
 		// Check to see if opening parenthesis count is same as closing
 		int opening = input.length() - input.replace("(", "").length();
 		int closing = input.length() - input.replace(")", "").length();
-		if (opening != closing) throw new WorkspaceInputException("Number of '(' does not equal number of ')'.");
-		if (opening == 0 && closing == 0) return;
+		if (opening != closing)
+			throw new WorkspaceInputException("Number of '(' does not equal number of ')'.");
+		if (opening == 0 && closing == 0)
+			return;
 
 		// Check to see if starting/ending characters are invalid parenthesis
-		if (input.charAt(0) == ')' || input.charAt(input.length() - 1) == '(') throw new WorkspaceInputException("Invalid parentheses placement (start/end).");
+		if (input.charAt(0) == ')' || input.charAt(input.length() - 1) == '(')
+			throw new WorkspaceInputException("Invalid parentheses placement (start/end).");
 
 		// Check to make sure all parenthesis are followed by valid characters
 		String characters = ".^*+-=)\\]'";
 		Pattern pattern = Pattern.compile("\\)[^" + characters + "]");
 		Matcher matcher = pattern.matcher(input);
-		if (matcher.find()) throw new WorkspaceInputException("Invalid character placement after ')'.");
+		if (matcher.find())
+			throw new WorkspaceInputException("Invalid character placement after ')'.");
 
-		String characterPattern = "\\([^a-zA-Z0-9\\+\\-()\\[.]";
+		String characterPattern = "\\([^a-zA-Z0-9\\+\\-()\\[.:]";
 		pattern = Pattern.compile(characterPattern);
 		matcher = pattern.matcher(input);
-		if (matcher.find()) throw new WorkspaceInputException("Invalid character placement after '('.");
+		if (matcher.find())
+			throw new WorkspaceInputException("Invalid character placement after '('.");
 	}
 
 	private void checkBrackets(String input) throws WorkspaceInputException {
 		// Check to see if opening brackets count is same as closing
 		int opening = input.length() - input.replace("[", "").length();
 		int closing = input.length() - input.replace("]", "").length();
-		if (opening != closing) throw new WorkspaceInputException("Number of '[' does not equal number of ']'.");
-		if (opening == 0 && closing == 0) return;
+		if (opening != closing)
+			throw new WorkspaceInputException("Number of '[' does not equal number of ']'.");
+		if (opening == 0 && closing == 0)
+			return;
 
 		// Check to see if starting/ending characters are invalid brackets
-		if (input.charAt(0) == ']' || input.charAt(input.length() - 1) == '[') throw new WorkspaceInputException("Invalid bracket placement (start/end).");
+		if (input.charAt(0) == ']' || input.charAt(input.length() - 1) == '[')
+			throw new WorkspaceInputException("Invalid bracket placement (start/end).");
 
 		// Check to make sure all brackets are followed by valid characters
 		String characters = ".^*+-=)\\[\\],;'\\s";
 		Pattern pattern = Pattern.compile("\\][^" + characters + "]");
 		Matcher matcher = pattern.matcher(input);
-		if (matcher.find()) throw new WorkspaceInputException("Invalid character placement after ']'.");
+		if (matcher.find())
+			throw new WorkspaceInputException("Invalid character placement after ']'.");
 
 		String characterPattern = "\\[[^a-zA-Z0-9(\\[.]";
 		pattern = Pattern.compile(characterPattern);
 		matcher = pattern.matcher(input);
-		if (matcher.find()) throw new WorkspaceInputException("Invalid character placement after '['.");
+		if (matcher.find())
+			throw new WorkspaceInputException("Invalid character placement after '['.");
 	}
 
 	private void checkAssignment(String input) throws WorkspaceInputException {
-		if (!input.contains("=")) return;
-		if (input.split("=").length > 2) throw new WorkspaceInputException("Too many assignment operators ('=').");
+		if (!input.contains("="))
+			return;
+		if (input.split("=").length > 2)
+			throw new WorkspaceInputException("Too many assignment operators ('=').");
 		String[] sides = input.split("=");
 		String left = sides[0];
 		String patternCharacters = "^[A-Za-z][A-Za-z0-9_]*$";
 		Pattern pattern = Pattern.compile(patternCharacters);
 		Matcher matcher = pattern.matcher(left);
-		if (!matcher.find()) throw new WorkspaceInputException("The expression to the left of the equals sign is not a valid target for an assignment.");
+		if (!matcher.find())
+			throw new WorkspaceInputException("The expression to the left of the equals sign is not a valid target for an assignment.");
 		boolean isFunction = Function.getFunction(left) != null;
-		if (isFunction) throw new WorkspaceInputException("Can't use function name in variable declaration.");
+		if (isFunction)
+			throw new WorkspaceInputException("Can't use function name in variable declaration.");
 	}
 
 	private void checkStatement(String input) throws WorkspaceInputException {
@@ -118,7 +133,8 @@ public class Workspace implements Runnable {
 	 * 
 	 * @param input
 	 *            - String to be evaluated
-	 * @return a formatted string that can be used as output. String returned will be empty if display is set to false
+	 * @return a formatted string that can be used as output. String returned
+	 *         will be empty if display is set to false
 	 */
 	private String evaluate(String input, boolean display) throws WorkspaceInputException {
 		String ret = "";
@@ -150,7 +166,8 @@ public class Workspace implements Runnable {
 		// First check to see if there is an assignment operator
 		if (input.indexOf('=') != -1) {
 			String[] sides = input.split("=");
-			String left = sides[0]; // left side is the variable name and must be saved
+			String left = sides[0]; // left side is the variable name and must
+									// be saved
 			String right = sides[1]; // right side is going to be evaluated
 			ExpressionValue value = simplify(right);
 			workspaceVariables.put(left, value);
@@ -164,7 +181,7 @@ public class Workspace implements Runnable {
 	}
 
 	private ExpressionValue simplify(String input) throws WorkspaceInputException {
-		if((input.charAt(0) == '\'' || input.charAt(0) == '"') && (input.charAt(input.length() - 1) == '\'' || input.charAt(input.length() - 1) == '"')){
+		if ((input.charAt(0) == '\'' || input.charAt(0) == '"') && (input.charAt(input.length() - 1) == '\'' || input.charAt(input.length() - 1) == '"')) {
 			return new StringValue(input.substring(1, input.length() - 1));
 		}
 		int opening = 0;
@@ -172,9 +189,9 @@ public class Workspace implements Runnable {
 		// Looking for :
 		List<ExpressionValue> list = new ArrayList<ExpressionValue>();
 		int begin = 0;
-		for(int i = 0; i < input.length(); i++){
+		for (int i = 0; i < input.length(); i++) {
 			char current = input.charAt(i);
-			if(i == input.length() - 1 && list.size() > 0){
+			if (i == input.length() - 1 && list.size() > 0) {
 				list.add(simplify(input.substring(begin)));
 				continue;
 			}
@@ -187,18 +204,19 @@ public class Workspace implements Runnable {
 				continue;
 			}
 			// Split
-			if(opening == 0 && current == ':'){
-				if(input.substring(begin, i).isEmpty()) throw new WorkspaceInputException("Invalid use of ':' operator.");
+			if (opening == 0 && current == ':') {
+				if (input.substring(begin, i).isEmpty())
+					throw new WorkspaceInputException("Invalid use of ':' operator.");
 				list.add(simplify(input.substring(begin, i)));
 				begin = i + 1;
 			}
 		}
-		if(!list.isEmpty()){
+		if (!list.isEmpty()) {
 			return MatOp.createVector(list);
 		}
-		
+
 		opening = 0;
-		
+
 		// Looking for + or -
 		for (int i = input.length() - 1; i >= 0; i--) {
 			char current = input.charAt(i);
@@ -212,15 +230,20 @@ public class Workspace implements Runnable {
 			}
 			if ((current == '+' || current == '-') && opening == 0) {
 				boolean elementWise = false;
-				if (i == input.length() - 1) throw new WorkspaceInputException("Operation missing second term.");
-				if (i - 1 == 0 && input.charAt(i - 1) == '.') throw new WorkspaceInputException("Invalid use of dot operator.");
-				if (i - 1 > 0 && input.charAt(i - 1) == '.') elementWise = true;
+				if (i == input.length() - 1)
+					throw new WorkspaceInputException("Operation missing second term.");
+				if (i - 1 == 0 && input.charAt(i - 1) == '.')
+					throw new WorkspaceInputException("Invalid use of dot operator.");
+				if (i - 1 > 0 && input.charAt(i - 1) == '.')
+					elementWise = true;
 				ExpressionValue v1 = null;
 				if (i == 0) {
 					v1 = new ScalarValue(0.0d);
 				} else if (input.charAt(i - 1) == '*' || input.charAt(i - 1) == '/' || input.charAt(i - 1) == '^') {
-					if (i - 2 < 0) throw new WorkspaceInputException("Operation missing first term.");
-					if (input.charAt(i - 2) == '.') elementWise = true;
+					if (i - 2 < 0)
+						throw new WorkspaceInputException("Operation missing first term.");
+					if (input.charAt(i - 2) == '.')
+						elementWise = true;
 					IOperation op = Operation.getOperation(Character.toString(input.charAt(i - 1))).getOperationInstance();
 					if (elementWise) {
 						return op.evaluate(simplify(input.substring(0, i - 2)), simplify(input.substring(i, input.length())), elementWise);
@@ -253,9 +276,12 @@ public class Workspace implements Runnable {
 			}
 			if ((current == '*' || current == '/') && opening == 0) {
 				boolean elementWise = false;
-				if (i == input.length() - 1) throw new WorkspaceInputException("Operation missing second term.");
-				if (i - 1 == 0 && input.charAt(i - 1) == '.') throw new WorkspaceInputException("Invalid use of dot operator.");
-				if (i - 1 > 0 && input.charAt(i - 1) == '.') elementWise = true;
+				if (i == input.length() - 1)
+					throw new WorkspaceInputException("Operation missing second term.");
+				if (i - 1 == 0 && input.charAt(i - 1) == '.')
+					throw new WorkspaceInputException("Invalid use of dot operator.");
+				if (i - 1 > 0 && input.charAt(i - 1) == '.')
+					elementWise = true;
 				ExpressionValue v1 = null;
 				if (i == 0) {
 					throw new WorkspaceInputException("Invalid operation placement.");
@@ -285,9 +311,12 @@ public class Workspace implements Runnable {
 			}
 			if (current == '^' && opening == 0) {
 				boolean elementWise = false;
-				if (i == input.length() - 1) throw new WorkspaceInputException("Operation missing second term.");
-				if (i - 1 == 0 && input.charAt(i - 1) == '.') throw new WorkspaceInputException("Invalid use of dot operator.");
-				if (i - 1 > 0 && input.charAt(i - 1) == '.') elementWise = true;
+				if (i == input.length() - 1)
+					throw new WorkspaceInputException("Operation missing second term.");
+				if (i - 1 == 0 && input.charAt(i - 1) == '.')
+					throw new WorkspaceInputException("Invalid use of dot operator.");
+				if (i - 1 > 0 && input.charAt(i - 1) == '.')
+					elementWise = true;
 				ExpressionValue v1 = null;
 				if (i == 0) {
 					throw new WorkspaceInputException("Invalid operation placement.");
@@ -300,7 +329,8 @@ public class Workspace implements Runnable {
 
 		// Transpose
 		if (input.charAt(input.length() - 1) == '\'') {
-			if (input.length() == 1) throw new WorkspaceInputException("Invalid use of transpose operation.");
+			if (input.length() == 1)
+				throw new WorkspaceInputException("Invalid use of transpose operation.");
 			return MatOp.transpose(simplify(input.substring(0, input.length() - 1)));
 		}
 
@@ -314,61 +344,65 @@ public class Workspace implements Runnable {
 			Function func = Function.getFunction(name);
 			IFunction function = null;
 			boolean isFunction = func != null;
-			if(!isFunction && !workspaceVariables.containsKey(name)) throw new WorkspaceInputException("Undefined function or variable '" + name + "'.");
+			if (!isFunction && !workspaceVariables.containsKey(name))
+				throw new WorkspaceInputException("Undefined function or variable '" + name + "'.");
 			ExpressionValue value = null;
-			if(!isFunction) value = workspaceVariables.get(name);
-			else function = func.getFunctionInstance();
+			if (!isFunction)
+				value = workspaceVariables.get(name);
+			else
+				function = func.getFunctionInstance();
 			List<ExpressionValue> params = new ArrayList<ExpressionValue>();
 			characters = "\\(.+\\)";
 			pattern = Pattern.compile(characters);
 			matcher = pattern.matcher(input);
 			begin = 0;
-			if (matcher.find()){
-				String p = (String)matcher.group().subSequence(1, matcher.group().length() - 1);
+			if (matcher.find()) {
+				String p = (String) matcher.group().subSequence(1, matcher.group().length() - 1);
 				opening = 0;
-				for(int i = 0; i < p.length(); i++){
+				for (int i = 0; i < p.length(); i++) {
 					char character = p.charAt(i);
-					if((p.charAt(i) == ',' && opening == 0) || i == p.length() - 1){
-						// If its not a function, have to handle ':' and special 'end' keyword
+					if ((p.charAt(i) == ',' && opening == 0) || i == p.length() - 1) {
+						// If its not a function, have to handle ':' and special
+						// 'end' keyword
 						String str = i == p.length() - 1 ? p.substring(begin) : p.substring(begin, i);
-						if(!isFunction){
-							if(str.length() == 1 && str.charAt(0) == ':'){
-								str = "1:" + (value instanceof ScalarValue ? "1" : "" + (((MatrixValue)value).getRows() * ((MatrixValue)value).getCols()));
-							}else{								
-								if(value instanceof MatrixValue){
-									// Linear indexing
-									if(params.size() == 0 && i == p.length() - 1){
-										str = str.replace("end", "" + value.getMaxIndex());
-									}
-									// 2D indexing rows
-									else if(params.size() == 0){
-										str = str.replace("end", "" + ((MatrixValue)value).getRows());
-									}
-									// 2D indexing cols
-									else{
-										str = str.replace("end", "" + ((MatrixValue)value).getCols());
-									}
-								}
-								else{
+						if (!isFunction) {
+							if (str.length() == 1 && str.charAt(0) == ':') {
+								str = "(1:end)'";
+							}
+							if (value instanceof MatrixValue) {
+								// Linear indexing
+								if (params.size() == 0 && i == p.length() - 1) {
 									str = str.replace("end", "" + value.getMaxIndex());
 								}
+								// 2D indexing rows
+								else if (params.size() == 0) {
+									str = str.replace("end", "" + ((MatrixValue) value).getRows());
+								}
+								// 2D indexing cols
+								else {
+									str = str.replace("end", "" + ((MatrixValue) value).getCols());
+								}
+							} else {
+								str = str.replace("end", "" + value.getMaxIndex());
 							}
+
 						}
 						params.add(simplify(str));
 						begin = i + 1;
 						continue;
 					}
-					if(character == '(' || character == '['){
+					if (character == '(' || character == '[') {
 						opening++;
 						continue;
 					}
-					if(character == ')' || character == ']'){
+					if (character == ')' || character == ']') {
 						opening--;
 						continue;
 					}
 				}
-			}else{
-				if(isFunction) throw new WorkspaceInputException("No parameters for function " + name + ".");
+			} else {
+				if (isFunction)
+					throw new WorkspaceInputException("No parameters for function " + name + ".");
 			}
 			return isFunction ? function.evaluate(params) : MatOp.index(value, params);
 		}
@@ -399,7 +433,8 @@ public class Workspace implements Runnable {
 			}
 			if (c == ';' && opening == 0) {
 				String sub = input.substring(begin, i);
-				if (!sub.isEmpty()) rows.add(sub);
+				if (!sub.isEmpty())
+					rows.add(sub);
 				begin = i + 1;
 			}
 		}
@@ -424,7 +459,8 @@ public class Workspace implements Runnable {
 				}
 				if (c == ',' || c == ' ' && opening == 0) {
 					String sub = row.substring(begin, i);
-					if (!sub.isEmpty()) elements.add(sub);
+					if (!sub.isEmpty())
+						elements.add(sub);
 					begin = i + 1;
 				}
 			}
@@ -449,12 +485,14 @@ public class Workspace implements Runnable {
 			for (ExpressionValue v : rowElements) {
 				if (v instanceof MatrixValue) {
 					MatrixValue mV = (MatrixValue) v;
-					if (mV.getMatrix().getRowDimension() != matrix.getRowDimension()) throw new WorkspaceInputException("Horizontal concat dimension mismatch.");
+					if (mV.getMatrix().getRowDimension() != matrix.getRowDimension())
+						throw new WorkspaceInputException("Horizontal concat dimension mismatch.");
 					matrix.setSubMatrix(mV.getMatrix().getData(), 0, columnIndex);
 					columnIndex += mV.getMatrix().getColumnDimension();
 				} else {
 					ScalarValue sV = (ScalarValue) v;
-					if (matrix.getRowDimension() != 1) throw new WorkspaceInputException("Horizontal concat dimension mismatch.");
+					if (matrix.getRowDimension() != 1)
+						throw new WorkspaceInputException("Horizontal concat dimension mismatch.");
 					matrix.setEntry(0, columnIndex, sV.getScalar());
 					columnIndex++;
 				}
@@ -475,7 +513,8 @@ public class Workspace implements Runnable {
 			RealMatrix matrix = MatrixUtils.createRealMatrix(numRows, numCols);
 			int rowIndex = 0;
 			for (MatrixValue mV : columnElements) {
-				if (mV.getMatrix().getColumnDimension() != matrix.getColumnDimension()) throw new WorkspaceInputException("Vertical concat dimension mismatch.");
+				if (mV.getMatrix().getColumnDimension() != matrix.getColumnDimension())
+					throw new WorkspaceInputException("Vertical concat dimension mismatch.");
 				matrix.setSubMatrix(mV.getMatrix().getData(), rowIndex, 0);
 				rowIndex += mV.getMatrix().getRowDimension();
 			}
@@ -507,11 +546,13 @@ public class Workspace implements Runnable {
 	}
 
 	private ExpressionValue parseValue(String input) throws WorkspaceInputException {
-		if (workspaceVariables.containsKey(input)) return workspaceVariables.get(input);
+		if (workspaceVariables.containsKey(input))
+			return workspaceVariables.get(input);
 		String patternCharacters = "[^0-9.-]";
 		Pattern pattern = Pattern.compile(patternCharacters);
 		Matcher matcher = pattern.matcher(input);
-		if (matcher.find()) throw new WorkspaceInputException("Can't parse statment " + input);
+		if (matcher.find())
+			throw new WorkspaceInputException("Can't parse statment " + input);
 		double value = Double.parseDouble(input);
 		return new ScalarValue(value);
 	}
@@ -520,7 +561,9 @@ public class Workspace implements Runnable {
 	 * Splits user input into statements based on semicolons and commas.
 	 * 
 	 * @param input
-	 * @return a two object list where the first object in the list is an array of all the statements and the second object is a list of all the boolean values for whether or not each value should be displayed.
+	 * @return a two object list where the first object in the list is an array
+	 *         of all the statements and the second object is a list of all the
+	 *         boolean values for whether or not each value should be displayed.
 	 */
 	private List<Object> getStatements(String input) {
 		// Get rid of spaces
@@ -546,7 +589,7 @@ public class Workspace implements Runnable {
 				break;
 			}
 		}
-		
+
 		opening = 0;
 		List<String> statements = new ArrayList<String>();
 		List<Boolean> displayList = new ArrayList<Boolean>();
@@ -598,11 +641,13 @@ public class Workspace implements Runnable {
 				String[] statements = (String[]) list.get(0);
 				Boolean[] displayValues = (Boolean[]) list.get(1);
 				for (int i = 0; i < statements.length; i++) {
-					if (statements[i].isEmpty()) continue;
+					if (statements[i].isEmpty())
+						continue;
 					checkStatement(statements[i]);
 					statements[i] = condenseStatment(statements[i]);
 					String formattedOutput = evaluate(statements[i], displayValues[i]);
-					if (!formattedOutput.isEmpty()) System.out.println(formattedOutput);
+					if (!formattedOutput.isEmpty())
+						System.out.println(formattedOutput);
 				}
 			} catch (WorkspaceInputException e) {
 				String formattedOutput = formatter.formatError(input, e);

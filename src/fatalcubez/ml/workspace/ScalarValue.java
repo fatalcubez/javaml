@@ -31,4 +31,10 @@ public final class ScalarValue implements ExpressionValue {
 	public Dimension getDimension() {
 		return new Dimension(1,1);
 	}
+
+	@Override
+	public double getValue(int row, int col) {
+		if(row > 0 || col > 0) throw new IllegalArgumentException("Index out of range.");
+		return scalar;
+	}
 }

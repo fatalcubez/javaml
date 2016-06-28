@@ -30,10 +30,6 @@ public final class MatrixValue implements ExpressionValue{
 	public int getCols(){
 		return matrix.getColumnDimension();
 	}
-	
-	public double getEntry(int row, int col){
-		return matrix.getEntry(row, col);
-	}
 
 	@Override
 	public String toString(){
@@ -48,11 +44,17 @@ public final class MatrixValue implements ExpressionValue{
 	@Override
 	public double getValue(int index) {
 		if(index > getMaxIndex() - 1) throw new IllegalArgumentException("Index out of range.");
-		return getEntry(index % getRows(), index / getRows());
+		return getValue(index % getRows(), index / getRows());
 	}
 
 	@Override
 	public Dimension getDimension() {
 		return new Dimension(getRows(), getCols());
+	}
+
+	@Override
+	public double getValue(int row, int col) {
+		if(row > getRows() - 1 || col > getCols() - 1) throw new IllegalArgumentException("Index out of range.");
+		return matrix.getEntry(row, col);
 	}
 }

@@ -67,7 +67,7 @@ public class MatOp {
 			RealMatrix ret = new Array2DRowRealMatrix(mV.getRows(), mV.getCols());
 			for (int i = 0; i < mV.getRows(); i++) {
 				for (int j = 0; j < mV.getCols(); j++) {
-					ret.setEntry(i, j, 1.0d / mV.getEntry(i, j));
+					ret.setEntry(i, j, 1.0d / mV.getValue(i, j));
 				}
 			}
 			return new MatrixValue(ret);
@@ -145,7 +145,7 @@ public class MatOp {
 		double[][] ret = new double[v1.getRows()][v1.getCols()];
 		for (int i = 0; i < v1.getRows(); i++) {
 			for (int j = 0; j < v1.getCols(); j++) {
-				ret[i][j] = v1.getEntry(i,j) * v2.getEntry(i,j);
+				ret[i][j] = v1.getValue(i,j) * v2.getValue(i,j);
 			}
 		}
 		return new MatrixValue(ret);
@@ -156,7 +156,7 @@ public class MatOp {
 		double[][] ret = new double[v1.getRows()][v1.getCols()];
 		for (int i = 0; i < v1.getRows(); i++) {
 			for (int j = 0; j < v1.getCols(); j++) {
-				ret[i][j] = v1.getEntry(i,j) * (1.0d / v2.getEntry(i,j));
+				ret[i][j] = v1.getValue(i,j) * (1.0d / v2.getValue(i,j));
 			}
 		}
 		return new MatrixValue(ret);
@@ -183,7 +183,7 @@ public class MatOp {
 		double[][] ret = new double[v2.getRows()][v2.getCols()];
 		for (int i = 0; i < v2.getRows(); i++) {
 			for (int j = 0; j < v2.getCols(); j++) {
-				ret[i][j] = Math.pow(v1.getScalar(), v2.getEntry(i,j));
+				ret[i][j] = Math.pow(v1.getScalar(), v2.getValue(i,j));
 			}
 		}
 		return new MatrixValue(ret);
@@ -193,7 +193,7 @@ public class MatOp {
 		double[][] ret = new double[v1.getRows()][v1.getCols()];
 		for (int i = 0; i < v1.getRows(); i++) {
 			for (int j = 0; j < v1.getCols(); j++) {
-				ret[i][j] = Math.pow(v1.getEntry(i,j), v2.getScalar());
+				ret[i][j] = Math.pow(v1.getValue(i,j), v2.getScalar());
 			}
 		}
 		return new MatrixValue(ret);
@@ -204,7 +204,7 @@ public class MatOp {
 		double[][] ret = new double[v1.getRows()][v1.getCols()];
 		for (int i = 0; i < v1.getRows(); i++) {
 			for (int j = 0; j < v1.getCols(); j++) {
-				ret[i][j] = Math.pow(v1.getEntry(i,j), v2.getEntry(i,j));
+				ret[i][j] = Math.pow(v1.getValue(i,j), v2.getValue(i,j));
 			}
 		}
 		return new MatrixValue(ret);
@@ -225,7 +225,7 @@ public class MatOp {
 			if (mV.getRows() == 1) {
 				double sum = 0;
 				for (int i = 0; i < mV.getCols(); i++) {
-					sum += mV.getMatrix().getEntry(0, i);
+					sum += mV.getValue(0, i);
 				}
 				return new ScalarValue(sum);
 			}
@@ -342,8 +342,8 @@ public class MatOp {
 		if(params.size() == 2){
 			ExpressionValue startValue = params.get(0);
 			ExpressionValue endValue = params.get(1);
-			double start = (startValue instanceof ScalarValue) ? ((ScalarValue)startValue).getScalar() : ((MatrixValue)startValue).getEntry(0, 0);
-			double end = (endValue instanceof ScalarValue) ? ((ScalarValue)endValue).getScalar() : ((MatrixValue)endValue).getEntry(0, 0);
+			double start = (startValue instanceof ScalarValue) ? ((ScalarValue)startValue).getScalar() : ((MatrixValue)startValue).getValue(0, 0);
+			double end = (endValue instanceof ScalarValue) ? ((ScalarValue)endValue).getScalar() : ((MatrixValue)endValue).getValue(0, 0);
 			if(end - start < 0) throw new WorkspaceInputException("Empty matrix created.");
 			int numElements = (int)(end - start + 1);
 			RealMatrix mat = new Array2DRowRealMatrix(1, numElements);
@@ -356,9 +356,9 @@ public class MatOp {
 			ExpressionValue startValue = params.get(0);
 			ExpressionValue incrementValue = params.get(1);
 			ExpressionValue endValue = params.get(2);
-			double start = (startValue instanceof ScalarValue) ? ((ScalarValue)startValue).getScalar() : ((MatrixValue)startValue).getEntry(0, 0);
-			double increment = (incrementValue instanceof ScalarValue) ? ((ScalarValue)incrementValue).getScalar() : ((MatrixValue)incrementValue).getEntry(0, 0);
-			double end = (endValue instanceof ScalarValue) ? ((ScalarValue)endValue).getScalar() : ((MatrixValue)endValue).getEntry(0, 0);
+			double start = (startValue instanceof ScalarValue) ? ((ScalarValue)startValue).getScalar() : ((MatrixValue)startValue).getValue(0, 0);
+			double increment = (incrementValue instanceof ScalarValue) ? ((ScalarValue)incrementValue).getScalar() : ((MatrixValue)incrementValue).getValue(0, 0);
+			double end = (endValue instanceof ScalarValue) ? ((ScalarValue)endValue).getScalar() : ((MatrixValue)endValue).getValue(0, 0);
 			if(Double.compare(increment, 0.0d) == 0) throw new WorkspaceInputException("Empty matrix created."); 
 			if((end - start < 0 && increment > 0) || (start - end < 0 && increment < 0)) throw new WorkspaceInputException("Empty matrix created.");
 			int numElements = (int)((end - start) / increment + 1);
@@ -380,14 +380,11 @@ public class MatOp {
 	public static ExpressionValue index(ExpressionValue value, List<ExpressionValue> params) throws WorkspaceInputException{
 		if(params.size() > 2) throw new WorkspaceInputException("Too many parameters for indexing expression.");
 		if(params.isEmpty()) return value;
-		// Make sure indices are positive integers
-		for(ExpressionValue e : params){
-			if(!isInteger(e)) throw new WorkspaceInputException("Indices must be positive integers.");
-			if(!inRange(e, 0, value.getMaxIndex())) throw new WorkspaceInputException("Index out of range.");
-		}
 		// Linear indexing
 		if(params.size() == 1){
 			ExpressionValue v1 = params.get(0);
+			if(!isInteger(v1)) throw new WorkspaceInputException("Indices must be positive integers.");
+			if(!inRange(v1, 0, value.getMaxIndex())) throw new WorkspaceInputException("Index out of range.");
 			if(v1.getMaxIndex() == 1) return new ScalarValue(value.getValue(0));
 			RealMatrix mat = new Array2DRowRealMatrix(v1.getDimension().getRows(), v1.getDimension().getCols());
 			for(int i = 0; i < mat.getRowDimension(); i++){
@@ -397,10 +394,22 @@ public class MatOp {
 			}
 			return new MatrixValue(mat);
 		}
+		// 2D indexing
 		else{
-			
+			ExpressionValue v1 = params.get(0);
+			ExpressionValue v2 = params.get(1);
+			if(!isInteger(v1) || !isInteger(v2)) throw new WorkspaceInputException("Indices must be positive integers.");
+			if(!inRange(v1, 0, value.getDimension().getRows()) || !inRange(v2, 0, value.getDimension().getCols())) throw new WorkspaceInputException("Index out of range.");
+			int rows = v1.getMaxIndex();
+			int cols = v2.getMaxIndex();
+			RealMatrix mat = new Array2DRowRealMatrix(rows, cols);
+			for(int i = 0; i < mat.getRowDimension(); i++){
+				for(int j = 0; j < mat.getColumnDimension(); j++){
+					mat.setEntry(i, j, value.getValue((int)(v1.getValue(i) - 1), (int)(v2.getValue(j) - 1)));
+				}
+			}
+			return new MatrixValue(mat);
 		}
-		return null;
 	}
 
 	public static MatrixValue getOnesMatrix(ScalarValue v1) throws WorkspaceInputException {

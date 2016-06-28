@@ -31,4 +31,10 @@ public class StringValue implements ExpressionValue{
 	public Dimension getDimension() {
 		return new Dimension(1, getMaxIndex());
 	}
+
+	@Override
+	public double getValue(int row, int col) {
+		if(row > 0 || col > getMaxIndex() - 1) throw new IllegalArgumentException("Index out of range.");
+		return getValue(col);
+	}
 }
