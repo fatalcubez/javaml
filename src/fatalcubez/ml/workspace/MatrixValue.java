@@ -3,7 +3,7 @@ package fatalcubez.ml.workspace;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 
-public final class MatrixValue extends ExpressionValue{
+public final class MatrixValue implements ExpressionValue{
 
 	/**
 	 * 
@@ -38,5 +38,16 @@ public final class MatrixValue extends ExpressionValue{
 	@Override
 	public String toString(){
 		return matrix.getRowDimension() + "," + matrix.getColumnDimension();
+	}
+
+	@Override
+	public int getMaxIndex() {
+		return getRows() * getCols();
+	}
+
+	@Override
+	public double getValue(int index) {
+		if(index > getMaxIndex() - 1) throw new IllegalArgumentException("Index out of range.");
+		return getEntry(index % getRows(), index / getCols());
 	}
 }

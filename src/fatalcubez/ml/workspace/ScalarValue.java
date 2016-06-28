@@ -1,6 +1,6 @@
 package fatalcubez.ml.workspace;
 
-public final class ScalarValue extends ExpressionValue {
+public final class ScalarValue implements ExpressionValue {
 	
 	/**
 	 * 
@@ -13,6 +13,17 @@ public final class ScalarValue extends ExpressionValue {
 	}
 	
 	public double getScalar() {
+		return scalar;
+	}
+
+	@Override
+	public int getMaxIndex() {
+		return 1;
+	}
+
+	@Override
+	public double getValue(int index) {
+		if(index > getMaxIndex() - 1) throw new IllegalArgumentException("Index out of range.");
 		return scalar;
 	}
 }

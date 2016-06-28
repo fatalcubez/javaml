@@ -333,8 +333,23 @@ public class Workspace implements Runnable {
 							if(str.length() == 1 && str.charAt(0) == ':'){
 								str = "1:" + (value instanceof ScalarValue ? "1" : "" + (((MatrixValue)value).getRows() * ((MatrixValue)value).getCols()));
 							}else{								
-								// TODO: handle linear indexing vs. two-dimensional
-								str = str.replace("end", value instanceof ScalarValue ? "1" : "" + (((MatrixValue)value).getRows() * ((MatrixValue)value).getCols()));
+								if(value instanceof MatrixValue){
+									// Linear indexing
+									if(params.size() == 0 && i == p.length() - 1){
+										str = str.replace("end", "" + value.getMaxIndex());
+									}
+									// 2D indexing rows
+									else if(params.size() == 0){
+										str = str.replace("end", "" + ((MatrixValue)value).getRows());
+									}
+									// 2D indexing cols
+									else{
+										str = str.replace("end", "" + ((MatrixValue)value).getCols());
+									}
+								}
+								else{
+									str = str.replace("end", "" + value.getMaxIndex());
+								}
 							}
 						}else{
 							params.add(simplify(str));

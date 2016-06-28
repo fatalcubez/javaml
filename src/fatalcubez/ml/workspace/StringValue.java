@@ -1,6 +1,6 @@
 package fatalcubez.ml.workspace;
 
-public class StringValue extends ExpressionValue{
+public class StringValue implements ExpressionValue{
 
 	/**
 	 * 
@@ -14,5 +14,16 @@ public class StringValue extends ExpressionValue{
 
 	public String getValue() {
 		return value;
+	}
+
+	@Override
+	public int getMaxIndex() {
+		return value.length();
+	}
+
+	@Override
+	public double getValue(int index) {
+		if(index > getMaxIndex() - 1) throw new IllegalArgumentException("Index out of range.");
+		return (double)value.charAt(index);
 	}
 }

@@ -2,11 +2,9 @@ package fatalcubez.ml.workspace;
 
 import java.io.Serializable;
 
-public class ExpressionValue implements Serializable{
+public interface ExpressionValue extends Serializable{
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4991337061563526438L;
+	public int getMaxIndex();
+	public double getValue(int index);
 
 }
