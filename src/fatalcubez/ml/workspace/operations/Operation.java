@@ -32,6 +32,51 @@ public enum Operation {
 		public IOperation getOperationInstance() {
 			return new PowerOperation();
 		}
+	},
+	EQUAL("=="){
+		@Override
+		public IOperation getOperationInstance() {
+			return null;
+		}
+	},
+	NOT_EQUAL("~="){
+		@Override
+		public IOperation getOperationInstance() {
+			return null;
+		}
+	},
+	GREATER_THAN(">"){
+		@Override
+		public IOperation getOperationInstance() {
+			return null;
+		}
+	},GREATER_THAN_EQUAL(">="){
+		@Override
+		public IOperation getOperationInstance() {
+			return null;
+		}
+	},LESS_THAN("<"){
+		@Override
+		public IOperation getOperationInstance() {
+			return null;
+		}
+	},LESS_THAN_EQUAL("<="){
+		@Override
+		public IOperation getOperationInstance() {
+			return null;
+		}
+	},
+	AND("&"){
+		@Override
+		public IOperation getOperationInstance() {
+			return null;
+		}
+	},
+	OR("|"){
+		@Override
+		public IOperation getOperationInstance() {
+			return null;
+		}
 	};
 	
 	private String consoleName;

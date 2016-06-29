@@ -218,6 +218,17 @@ public class MatOp {
 		MatrixValue mV = (MatrixValue) v1;
 		return new MatrixValue(mV.getMatrix().transpose());
 	}
+	
+	public static ExpressionValue negate(ExpressionValue v1) throws WorkspaceInputException{
+		if(v1.getMaxIndex() == 1) return Double.compare(v1.getValue(0), 0.0d) == 0 ? new ScalarValue(1.0d) : new ScalarValue(0.0d);
+		RealMatrix mat = new Array2DRowRealMatrix(v1.getDimension().getRows(), v1.getDimension().getCols());
+		for(int i = 0; i < mat.getRowDimension(); i++){
+			for(int j = 0; j < mat.getColumnDimension(); j++){
+				mat.setEntry(i, j, Double.compare(v1.getValue(i, j), 0.0d) == 0 ? 1 : 0);
+			}
+		}
+		return new MatrixValue(mat);
+	}
 
 	public static ExpressionValue sum(ExpressionValue v1) throws WorkspaceInputException {
 		if (v1 instanceof MatrixValue) {

@@ -185,6 +185,8 @@ public class Workspace implements Runnable {
 			return new StringValue(input.substring(1, input.length() - 1));
 		}
 		int opening = 0;
+		
+		// Looking for logical operators
 
 		// Looking for :
 		List<ExpressionValue> list = new ArrayList<ExpressionValue>();
@@ -326,12 +328,19 @@ public class Workspace implements Runnable {
 				return Operation.POWER.getOperationInstance().evaluate(v1, simplify(input.substring(i + 1, input.length())), elementWise);
 			}
 		}
+		
+		// Negate
+		if(input.charAt(0) == '~'){
+			if (input.length() == 1)
+				throw new WorkspaceInputException("Invalid use of negate operation.");
+			return MatOp.negate(simplify(input.substring(1)));
+		}
 
 		// Transpose
 		if (input.charAt(input.length() - 1) == '\'') {
 			if (input.length() == 1)
 				throw new WorkspaceInputException("Invalid use of transpose operation.");
-			return MatOp.transpose(simplify(input.substring(0, input.length() - 1)));
+			return MatOp.transpose(input.charAt(input.length() - 2) == '.' ? simplify(input.substring(0, input.length() - 2)) : simplify(input.substring(0, input.length() - 1)));
 		}
 
 		// Check for function or indexing
