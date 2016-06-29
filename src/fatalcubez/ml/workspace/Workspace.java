@@ -65,17 +65,17 @@ public class Workspace implements Runnable {
 			throw new WorkspaceInputException("Invalid parentheses placement (start/end).");
 
 		// Check to make sure all parenthesis are followed by valid characters
-		String characters = ".^*+-=)\\]'";
-		Pattern pattern = Pattern.compile("\\)[^" + characters + "]");
-		Matcher matcher = pattern.matcher(input);
-		if (matcher.find())
-			throw new WorkspaceInputException("Invalid character placement after ')'.");
-
-		String characterPattern = "\\([^a-zA-Z0-9\\+\\-()\\[.:]";
-		pattern = Pattern.compile(characterPattern);
-		matcher = pattern.matcher(input);
-		if (matcher.find())
-			throw new WorkspaceInputException("Invalid character placement after '('.");
+//		String characters = ".^*+-=)\\]'";
+//		Pattern pattern = Pattern.compile("\\)[^" + characters + "]");
+//		Matcher matcher = pattern.matcher(input);
+//		if (matcher.find())
+//			throw new WorkspaceInputException("Invalid character placement after ')'.");
+//
+//		String characterPattern = "\\([^a-zA-Z0-9\\+\\-()\\[.:]";
+//		pattern = Pattern.compile(characterPattern);
+//		matcher = pattern.matcher(input);
+//		if (matcher.find())
+//			throw new WorkspaceInputException("Invalid character placement after '('.");
 	}
 
 	private void checkBrackets(String input) throws WorkspaceInputException {
@@ -92,17 +92,17 @@ public class Workspace implements Runnable {
 			throw new WorkspaceInputException("Invalid bracket placement (start/end).");
 
 		// Check to make sure all brackets are followed by valid characters
-		String characters = ".^*+-=)\\[\\],;'\\s";
-		Pattern pattern = Pattern.compile("\\][^" + characters + "]");
-		Matcher matcher = pattern.matcher(input);
-		if (matcher.find())
-			throw new WorkspaceInputException("Invalid character placement after ']'.");
-
-		String characterPattern = "\\[[^a-zA-Z0-9(\\[.]";
-		pattern = Pattern.compile(characterPattern);
-		matcher = pattern.matcher(input);
-		if (matcher.find())
-			throw new WorkspaceInputException("Invalid character placement after '['.");
+//		String characters = ".^*+-=)\\[\\],;'\\s";
+//		Pattern pattern = Pattern.compile("\\][^" + characters + "]");
+//		Matcher matcher = pattern.matcher(input);
+//		if (matcher.find())
+//			throw new WorkspaceInputException("Invalid character placement after ']'.");
+//
+//		String characterPattern = "\\[[^a-zA-Z0-9(\\[.]";
+//		pattern = Pattern.compile(characterPattern);
+//		matcher = pattern.matcher(input);
+//		if (matcher.find())
+//			throw new WorkspaceInputException("Invalid character placement after '['.");
 	}
 
 	private void checkAssignment(String input) throws WorkspaceInputException {
@@ -186,8 +186,42 @@ public class Workspace implements Runnable {
 		}
 		int opening = 0;
 		
-		// Looking for logical operators
-
+		// Looking for | operator
+		for (int i = input.length() - 1; i >= 0; i--) {
+			char current = input.charAt(i);
+			if (current == '(' || current == '[') {
+				opening++;
+				continue;
+			}
+			if (current == ')' || current == ']') {
+				opening--;
+				continue;
+			}
+			if (current == '|' && opening == 0) {
+				boolean elementWise = false;
+				if (i == input.length() - 1)
+					throw new WorkspaceInputException("Operation missing second term.");
+				if (i - 1 == 0 && input.charAt(i - 1) == '.')
+					throw new WorkspaceInputException("Invalid use of dot operator.");
+				if (i - 1 > 0 && input.charAt(i - 1) == '.')
+					elementWise = true;
+				ExpressionValue v1 = null;
+				if (i == 0) {
+					throw new WorkspaceInputException("Invalid operation placement.");
+				} else {
+					v1 = elementWise ? simplify(input.substring(0, i - 1)) : simplify(input.substring(0, i));
+				}
+				return Operation.OR.getOperationInstance().evaluate(v1, simplify(input.substring(i + 1, input.length())), elementWise);
+			}
+		}
+		
+		// Looking for & operator
+		
+		// Looking for ==, ~=, >, >=, <, <= operators
+		
+		
+		opening = 0;
+		
 		// Looking for :
 		List<ExpressionValue> list = new ArrayList<ExpressionValue>();
 		int begin = 0;

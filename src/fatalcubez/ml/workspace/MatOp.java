@@ -10,7 +10,8 @@ import org.apache.commons.math3.linear.RealMatrix;
 public class MatOp {
 
 	public static ExpressionValue multiply(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException {
-		if (isStringArgument(v1) || isStringArgument(v2)) throw new WorkspaceInputException("Can't operate with string values.");
+		if (isStringArgument(v1) || isStringArgument(v2))
+			throw new WorkspaceInputException("Can't operate with string values.");
 		if (v1 instanceof ScalarValue && v2 instanceof ScalarValue) {
 			return multiply((ScalarValue) v1, (ScalarValue) v2);
 		}
@@ -35,12 +36,14 @@ public class MatOp {
 	}
 
 	private static ExpressionValue multiply(MatrixValue v1, MatrixValue v2) throws WorkspaceInputException {
-		if (v1.getCols() != v2.getRows()) throw new WorkspaceInputException("Inner matrix dimensions must agree.");
+		if (v1.getCols() != v2.getRows())
+			throw new WorkspaceInputException("Inner matrix dimensions must agree.");
 		return new MatrixValue(v1.getMatrix().multiply(v2.getMatrix()));
 	}
 
 	public static ExpressionValue divide(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException {
-		if (isStringArgument(v1) || isStringArgument(v2)) throw new WorkspaceInputException("Can't operate with string values.");
+		if (isStringArgument(v1) || isStringArgument(v2))
+			throw new WorkspaceInputException("Can't operate with string values.");
 		if (v1 instanceof ScalarValue && v2 instanceof ScalarValue) {
 			return multiply((ScalarValue) v1, (ScalarValue) reciprocal(v2));
 		}
@@ -57,7 +60,8 @@ public class MatOp {
 	}
 
 	public static ExpressionValue reciprocal(ExpressionValue v1) throws WorkspaceInputException {
-		if (isStringArgument(v1)) throw new WorkspaceInputException("Can't operate with string values.");
+		if (isStringArgument(v1))
+			throw new WorkspaceInputException("Can't operate with string values.");
 		if (v1 instanceof ScalarValue) {
 			ScalarValue sV = (ScalarValue) v1;
 			return new ScalarValue(1.0d / sV.getScalar());
@@ -76,7 +80,8 @@ public class MatOp {
 	}
 
 	public static ExpressionValue add(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException {
-		if (isStringArgument(v1) || isStringArgument(v2)) throw new WorkspaceInputException("Can't operate with string values.");
+		if (isStringArgument(v1) || isStringArgument(v2))
+			throw new WorkspaceInputException("Can't operate with string values.");
 		if (v1 instanceof ScalarValue && v2 instanceof ScalarValue) {
 			return add((ScalarValue) v1, (ScalarValue) v2);
 		}
@@ -101,7 +106,8 @@ public class MatOp {
 	}
 
 	private static ExpressionValue add(MatrixValue v1, MatrixValue v2) throws WorkspaceInputException {
-		if (!areEqualDimensions(v1, v2)) throw new WorkspaceInputException("Matrix dimensions must be equal.");
+		if (!areEqualDimensions(v1, v2))
+			throw new WorkspaceInputException("Matrix dimensions must be equal.");
 		return new MatrixValue(v1.getMatrix().add(v2.getMatrix()));
 	}
 
@@ -111,7 +117,9 @@ public class MatOp {
 	}
 
 	/**
-	 * Computes the value when v1 is raised to the v2 power. Currently doesn't work for raising a scalar to a matrix value or a matrix value raised to another matrix value
+	 * Computes the value when v1 is raised to the v2 power. Currently doesn't
+	 * work for raising a scalar to a matrix value or a matrix value raised to
+	 * another matrix value
 	 * 
 	 * @param v1
 	 * @param v2
@@ -119,7 +127,8 @@ public class MatOp {
 	 * @throws WorkspaceInputException
 	 */
 	public static ExpressionValue power(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException {
-		if (isStringArgument(v1) || isStringArgument(v2)) throw new WorkspaceInputException("Can't operate with string values.");
+		if (isStringArgument(v1) || isStringArgument(v2))
+			throw new WorkspaceInputException("Can't operate with string values.");
 		if (v1 instanceof ScalarValue && v2 instanceof ScalarValue) {
 			return power((ScalarValue) v1, (ScalarValue) v2);
 		}
@@ -134,36 +143,42 @@ public class MatOp {
 	}
 
 	private static ExpressionValue power(MatrixValue v1, ScalarValue v2) throws WorkspaceInputException {
-		if (!isInteger(v2.getScalar())) throw new WorkspaceInputException("Must use integers when raising a matrix to a power.");
-		if (v1.getRows() != v1.getCols()) throw new WorkspaceInputException("Must use a SQUARE matrix as input.");
-		if (v2.getScalar() < 0) throw new WorkspaceInputException("Can't raise matrix to a negative power.");
+		if (!isInteger(v2.getScalar()))
+			throw new WorkspaceInputException("Must use integers when raising a matrix to a power.");
+		if (v1.getRows() != v1.getCols())
+			throw new WorkspaceInputException("Must use a SQUARE matrix as input.");
+		if (v2.getScalar() < 0)
+			throw new WorkspaceInputException("Can't raise matrix to a negative power.");
 		return new MatrixValue(v1.getMatrix().power((int) Math.floor(v2.getScalar())));
 	}
 
 	public static ExpressionValue elementWiseMultiply(MatrixValue v1, MatrixValue v2) throws WorkspaceInputException {
-		if (!areEqualDimensions(v1, v2)) throw new WorkspaceInputException("Matrix dimensions must be equal.");
+		if (!areEqualDimensions(v1, v2))
+			throw new WorkspaceInputException("Matrix dimensions must be equal.");
 		double[][] ret = new double[v1.getRows()][v1.getCols()];
 		for (int i = 0; i < v1.getRows(); i++) {
 			for (int j = 0; j < v1.getCols(); j++) {
-				ret[i][j] = v1.getValue(i,j) * v2.getValue(i,j);
+				ret[i][j] = v1.getValue(i, j) * v2.getValue(i, j);
 			}
 		}
 		return new MatrixValue(ret);
 	}
 
 	public static ExpressionValue elementWiseDivide(MatrixValue v1, MatrixValue v2) throws WorkspaceInputException {
-		if (!areEqualDimensions(v1, v2)) throw new WorkspaceInputException("Matrix dimensions must be equal.");
+		if (!areEqualDimensions(v1, v2))
+			throw new WorkspaceInputException("Matrix dimensions must be equal.");
 		double[][] ret = new double[v1.getRows()][v1.getCols()];
 		for (int i = 0; i < v1.getRows(); i++) {
 			for (int j = 0; j < v1.getCols(); j++) {
-				ret[i][j] = v1.getValue(i,j) * (1.0d / v2.getValue(i,j));
+				ret[i][j] = v1.getValue(i, j) * (1.0d / v2.getValue(i, j));
 			}
 		}
 		return new MatrixValue(ret);
 	}
 
 	public static ExpressionValue elementWisePower(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException {
-		if (isStringArgument(v1) || isStringArgument(v2)) throw new WorkspaceInputException("Can't operate with string values.");
+		if (isStringArgument(v1) || isStringArgument(v2))
+			throw new WorkspaceInputException("Can't operate with string values.");
 		if (v1 instanceof ScalarValue && v2 instanceof ScalarValue) {
 			return power(v1, v2);
 		}
@@ -183,7 +198,7 @@ public class MatOp {
 		double[][] ret = new double[v2.getRows()][v2.getCols()];
 		for (int i = 0; i < v2.getRows(); i++) {
 			for (int j = 0; j < v2.getCols(); j++) {
-				ret[i][j] = Math.pow(v1.getScalar(), v2.getValue(i,j));
+				ret[i][j] = Math.pow(v1.getScalar(), v2.getValue(i, j));
 			}
 		}
 		return new MatrixValue(ret);
@@ -193,41 +208,32 @@ public class MatOp {
 		double[][] ret = new double[v1.getRows()][v1.getCols()];
 		for (int i = 0; i < v1.getRows(); i++) {
 			for (int j = 0; j < v1.getCols(); j++) {
-				ret[i][j] = Math.pow(v1.getValue(i,j), v2.getScalar());
+				ret[i][j] = Math.pow(v1.getValue(i, j), v2.getScalar());
 			}
 		}
 		return new MatrixValue(ret);
 	}
 
 	private static ExpressionValue elementWisePower(MatrixValue v1, MatrixValue v2) throws WorkspaceInputException {
-		if (!areEqualDimensions(v1, v2)) throw new WorkspaceInputException("Matrix dimensions must be equal.");
+		if (!areEqualDimensions(v1, v2))
+			throw new WorkspaceInputException("Matrix dimensions must be equal.");
 		double[][] ret = new double[v1.getRows()][v1.getCols()];
 		for (int i = 0; i < v1.getRows(); i++) {
 			for (int j = 0; j < v1.getCols(); j++) {
-				ret[i][j] = Math.pow(v1.getValue(i,j), v2.getValue(i,j));
+				ret[i][j] = Math.pow(v1.getValue(i, j), v2.getValue(i, j));
 			}
 		}
 		return new MatrixValue(ret);
 	}
 
 	public static ExpressionValue transpose(ExpressionValue v1) throws WorkspaceInputException {
-		if (isStringArgument(v1)) throw new WorkspaceInputException("Can't operate with string values.");
+		if (isStringArgument(v1))
+			throw new WorkspaceInputException("Can't operate with string values.");
 		if (v1 instanceof ScalarValue) {
 			return v1;
 		}
 		MatrixValue mV = (MatrixValue) v1;
 		return new MatrixValue(mV.getMatrix().transpose());
-	}
-	
-	public static ExpressionValue negate(ExpressionValue v1) throws WorkspaceInputException{
-		if(v1.getMaxIndex() == 1) return Double.compare(v1.getValue(0), 0.0d) == 0 ? new ScalarValue(1.0d) : new ScalarValue(0.0d);
-		RealMatrix mat = new Array2DRowRealMatrix(v1.getDimension().getRows(), v1.getDimension().getCols());
-		for(int i = 0; i < mat.getRowDimension(); i++){
-			for(int j = 0; j < mat.getColumnDimension(); j++){
-				mat.setEntry(i, j, Double.compare(v1.getValue(i, j), 0.0d) == 0 ? 1 : 0);
-			}
-		}
-		return new MatrixValue(mat);
 	}
 
 	public static ExpressionValue sum(ExpressionValue v1) throws WorkspaceInputException {
@@ -245,9 +251,11 @@ public class MatOp {
 	}
 
 	public static ExpressionValue sum(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException {
-		if (!(v2 instanceof ScalarValue)) throw new WorkspaceInputException("Invalid dimension argument.");
+		if (!(v2 instanceof ScalarValue))
+			throw new WorkspaceInputException("Invalid dimension argument.");
 		ScalarValue sV = (ScalarValue) v2;
-		if (!isInteger(sV.getScalar()) || !inRange(sV.getScalar(), 1.0d, 2.0d)) throw new WorkspaceInputException("Invalid dimension argument.");
+		if (!isInteger(sV.getScalar()) || !inRange(sV.getScalar(), 1.0d, 2.0d))
+			throw new WorkspaceInputException("Invalid dimension argument.");
 		if (v1 instanceof MatrixValue) {
 			MatrixValue mV = (MatrixValue) v1;
 			int rows = mV.getRows();
@@ -284,9 +292,11 @@ public class MatOp {
 	}
 
 	public static ExpressionValue mean(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException {
-		if (!(v2 instanceof ScalarValue)) throw new WorkspaceInputException("Invalid dimension argument.");
+		if (!(v2 instanceof ScalarValue))
+			throw new WorkspaceInputException("Invalid dimension argument.");
 		ScalarValue sV = (ScalarValue) v2;
-		if (!isInteger(sV.getScalar()) || !inRange(sV.getScalar(), 1.0d, 2.0d)) throw new WorkspaceInputException("Invalid dimension argument.");
+		if (!isInteger(sV.getScalar()) || !inRange(sV.getScalar(), 1.0d, 2.0d))
+			throw new WorkspaceInputException("Invalid dimension argument.");
 		if (v1 instanceof MatrixValue) {
 			MatrixValue mV = (MatrixValue) v1;
 			int rows = mV.getRows();
@@ -317,10 +327,12 @@ public class MatOp {
 	}
 
 	public static MatrixValue getEyeMatrix(ScalarValue v1, ScalarValue v2) throws WorkspaceInputException {
-		if (!isInteger(v1.getScalar()) || !isInteger(v2.getScalar())) throw new WorkspaceInputException("Size inputs must be integers.");
+		if (!isInteger(v1.getScalar()) || !isInteger(v2.getScalar()))
+			throw new WorkspaceInputException("Size inputs must be integers.");
 		int rows = (int) v1.getScalar();
 		int cols = (int) v2.getScalar();
-		if (rows <= 0 || cols <= 0) throw new WorkspaceInputException("Size inputs must be greater than 0.");
+		if (rows <= 0 || cols <= 0)
+			throw new WorkspaceInputException("Size inputs must be greater than 0.");
 		if (rows != cols) {
 			return new MatrixValue(MatrixUtils.createRealIdentityMatrix(rows > cols ? rows : cols).getSubMatrix(0, rows - 1, 0, cols - 1));
 		} else {
@@ -333,53 +345,58 @@ public class MatOp {
 	}
 
 	public static MatrixValue getZerosMatrix(ScalarValue v1, ScalarValue v2) throws WorkspaceInputException {
-		if (!isInteger(v1.getScalar()) || !isInteger(v2.getScalar())) throw new WorkspaceInputException("Size inputs must be integers.");
+		if (!isInteger(v1.getScalar()) || !isInteger(v2.getScalar()))
+			throw new WorkspaceInputException("Size inputs must be integers.");
 		int rows = (int) v1.getScalar();
 		int cols = (int) v2.getScalar();
-		if (rows <= 0 || cols <= 0) throw new WorkspaceInputException("Size inputs must be greater than 0.");
+		if (rows <= 0 || cols <= 0)
+			throw new WorkspaceInputException("Size inputs must be greater than 0.");
 		if (rows != cols) {
 			return new MatrixValue(MatrixUtils.createRealMatrix(rows, cols).getSubMatrix(0, rows - 1, 0, cols - 1));
 		} else {
 			return new MatrixValue(MatrixUtils.createRealMatrix(rows, cols));
 		}
 	}
-	
+
 	// TODO: Handle empty matrices
-	public static MatrixValue createVector(List<ExpressionValue> params) throws WorkspaceInputException{
-		if(params.size() <= 1) throw new WorkspaceInputException("Invalid parameters for ':' operator.");
-		for(ExpressionValue e : params){
-			if(e instanceof StringValue) throw new WorkspaceInputException("Invalid string value for ':' operator.");
+	public static MatrixValue createVector(List<ExpressionValue> params) throws WorkspaceInputException {
+		if (params.size() <= 1)
+			throw new WorkspaceInputException("Invalid parameters for ':' operator.");
+		for (ExpressionValue e : params) {
+			if (e instanceof StringValue)
+				throw new WorkspaceInputException("Invalid string value for ':' operator.");
 		}
-		if(params.size() == 2){
+		if (params.size() == 2) {
 			ExpressionValue startValue = params.get(0);
 			ExpressionValue endValue = params.get(1);
-			double start = (startValue instanceof ScalarValue) ? ((ScalarValue)startValue).getScalar() : ((MatrixValue)startValue).getValue(0, 0);
-			double end = (endValue instanceof ScalarValue) ? ((ScalarValue)endValue).getScalar() : ((MatrixValue)endValue).getValue(0, 0);
-			if(end - start < 0) throw new WorkspaceInputException("Empty matrix created.");
-			int numElements = (int)(end - start + 1);
+			double start = (startValue instanceof ScalarValue) ? ((ScalarValue) startValue).getScalar() : ((MatrixValue) startValue).getValue(0, 0);
+			double end = (endValue instanceof ScalarValue) ? ((ScalarValue) endValue).getScalar() : ((MatrixValue) endValue).getValue(0, 0);
+			if (end - start < 0)
+				throw new WorkspaceInputException("Empty matrix created.");
+			int numElements = (int) (end - start + 1);
 			RealMatrix mat = new Array2DRowRealMatrix(1, numElements);
-			for(int i = 0; i < numElements; i++){
+			for (int i = 0; i < numElements; i++) {
 				mat.setEntry(0, i, i + start);
 			}
 			return new MatrixValue(mat);
-		}
-		else if(params.size() == 3){
+		} else if (params.size() == 3) {
 			ExpressionValue startValue = params.get(0);
 			ExpressionValue incrementValue = params.get(1);
 			ExpressionValue endValue = params.get(2);
-			double start = (startValue instanceof ScalarValue) ? ((ScalarValue)startValue).getScalar() : ((MatrixValue)startValue).getValue(0, 0);
-			double increment = (incrementValue instanceof ScalarValue) ? ((ScalarValue)incrementValue).getScalar() : ((MatrixValue)incrementValue).getValue(0, 0);
-			double end = (endValue instanceof ScalarValue) ? ((ScalarValue)endValue).getScalar() : ((MatrixValue)endValue).getValue(0, 0);
-			if(Double.compare(increment, 0.0d) == 0) throw new WorkspaceInputException("Empty matrix created."); 
-			if((end - start < 0 && increment > 0) || (start - end < 0 && increment < 0)) throw new WorkspaceInputException("Empty matrix created.");
-			int numElements = (int)((end - start) / increment + 1);
+			double start = (startValue instanceof ScalarValue) ? ((ScalarValue) startValue).getScalar() : ((MatrixValue) startValue).getValue(0, 0);
+			double increment = (incrementValue instanceof ScalarValue) ? ((ScalarValue) incrementValue).getScalar() : ((MatrixValue) incrementValue).getValue(0, 0);
+			double end = (endValue instanceof ScalarValue) ? ((ScalarValue) endValue).getScalar() : ((MatrixValue) endValue).getValue(0, 0);
+			if (Double.compare(increment, 0.0d) == 0)
+				throw new WorkspaceInputException("Empty matrix created.");
+			if ((end - start < 0 && increment > 0) || (start - end < 0 && increment < 0))
+				throw new WorkspaceInputException("Empty matrix created.");
+			int numElements = (int) ((end - start) / increment + 1);
 			RealMatrix mat = new Array2DRowRealMatrix(1, numElements);
-			for(int i = 0; i < numElements; i++){
+			for (int i = 0; i < numElements; i++) {
 				mat.setEntry(0, i, i * increment + start);
 			}
 			return new MatrixValue(mat);
-		}
-		else{
+		} else {
 			ExpressionValue e = createVector(params.subList(0, 3));
 			List<ExpressionValue> rest = new ArrayList<ExpressionValue>();
 			rest.add(e);
@@ -387,36 +404,43 @@ public class MatOp {
 			return createVector(rest);
 		}
 	}
-	
-	public static ExpressionValue index(ExpressionValue value, List<ExpressionValue> params) throws WorkspaceInputException{
-		if(params.size() > 2) throw new WorkspaceInputException("Too many parameters for indexing expression.");
-		if(params.isEmpty()) return value;
+
+	public static ExpressionValue index(ExpressionValue value, List<ExpressionValue> params) throws WorkspaceInputException {
+		if (params.size() > 2)
+			throw new WorkspaceInputException("Too many parameters for indexing expression.");
+		if (params.isEmpty())
+			return value;
 		// Linear indexing
-		if(params.size() == 1){
+		if (params.size() == 1) {
 			ExpressionValue v1 = params.get(0);
-			if(!isInteger(v1)) throw new WorkspaceInputException("Indices must be positive integers.");
-			if(!inRange(v1, 0, value.getMaxIndex())) throw new WorkspaceInputException("Index out of range.");
-			if(value.getMaxIndex() == 1) return new ScalarValue(value.getValue(0));
+			if (!isInteger(v1))
+				throw new WorkspaceInputException("Indices must be positive integers.");
+			if (!inRange(v1, 0, value.getMaxIndex()))
+				throw new WorkspaceInputException("Index out of range.");
+			if (value.getMaxIndex() == 1)
+				return new ScalarValue(value.getValue(0));
 			RealMatrix mat = new Array2DRowRealMatrix(v1.getDimension().getRows(), v1.getDimension().getCols());
-			for(int i = 0; i < mat.getRowDimension(); i++){
-				for(int j = 0; j < mat.getColumnDimension(); j++){
-					mat.setEntry(i, j, value.getValue((int)(v1.getValue(v1.getDimension().getRows() * j + i) - 1)));
+			for (int i = 0; i < mat.getRowDimension(); i++) {
+				for (int j = 0; j < mat.getColumnDimension(); j++) {
+					mat.setEntry(i, j, value.getValue((int) (v1.getValue(v1.getDimension().getRows() * j + i) - 1)));
 				}
 			}
 			return new MatrixValue(mat);
 		}
 		// 2D indexing
-		else{
+		else {
 			ExpressionValue v1 = params.get(0);
 			ExpressionValue v2 = params.get(1);
-			if(!isInteger(v1) || !isInteger(v2)) throw new WorkspaceInputException("Indices must be positive integers.");
-			if(!inRange(v1, 0, value.getDimension().getRows()) || !inRange(v2, 0, value.getDimension().getCols())) throw new WorkspaceInputException("Index out of range.");
+			if (!isInteger(v1) || !isInteger(v2))
+				throw new WorkspaceInputException("Indices must be positive integers.");
+			if (!inRange(v1, 0, value.getDimension().getRows()) || !inRange(v2, 0, value.getDimension().getCols()))
+				throw new WorkspaceInputException("Index out of range.");
 			int rows = v1.getMaxIndex();
 			int cols = v2.getMaxIndex();
 			RealMatrix mat = new Array2DRowRealMatrix(rows, cols);
-			for(int i = 0; i < mat.getRowDimension(); i++){
-				for(int j = 0; j < mat.getColumnDimension(); j++){
-					mat.setEntry(i, j, value.getValue((int)(v1.getValue(i) - 1), (int)(v2.getValue(j) - 1)));
+			for (int i = 0; i < mat.getRowDimension(); i++) {
+				for (int j = 0; j < mat.getColumnDimension(); j++) {
+					mat.setEntry(i, j, value.getValue((int) (v1.getValue(i) - 1), (int) (v2.getValue(j) - 1)));
 				}
 			}
 			return new MatrixValue(mat);
@@ -431,14 +455,57 @@ public class MatOp {
 		return (MatrixValue) add(getZerosMatrix(v1, v2), new ScalarValue(1.0d));
 	}
 
-	public static boolean isInteger(ExpressionValue v1){
-		for(int i = 0; i < v1.getMaxIndex(); i++){
+	/*
+	 * LOGIC OPERATIONS
+	 */
+	public static ExpressionValue negate(ExpressionValue v1) throws WorkspaceInputException {
+		if (v1.getMaxIndex() == 1)
+			return Double.compare(v1.getValue(0), 0.0d) == 0 ? new ScalarValue(1.0d) : new ScalarValue(0.0d);
+		RealMatrix mat = new Array2DRowRealMatrix(v1.getDimension().getRows(), v1.getDimension().getCols());
+		for (int i = 0; i < mat.getRowDimension(); i++) {
+			for (int j = 0; j < mat.getColumnDimension(); j++) {
+				mat.setEntry(i, j, Double.compare(v1.getValue(i, j), 0.0d) == 0 ? 1 : 0);
+			}
+		}
+		return new MatrixValue(mat);
+	}
+
+	public static ExpressionValue or(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException {
+		if (v1.getDimension().equals(v2.getDimension())) {
+			if (v1 instanceof ScalarValue)
+				return Double.compare(v1.getValue(0), 0.0d) != 0 || Double.compare(v2.getValue(0), 0.0d) != 0 ? new ScalarValue(1.0d) : new ScalarValue(0.0d);
+			RealMatrix mat = new Array2DRowRealMatrix(v1.getDimension().getRows(), v1.getDimension().getCols());
+			for (int i = 0; i < mat.getRowDimension(); i++) {
+				for (int j = 0; j < mat.getColumnDimension(); j++) {
+					mat.setEntry(i, j, Double.compare(v1.getValue(i, j), 0.0d) != 0 || Double.compare(v2.getValue(i, j), 0.0d) != 0 ? 1 : 0);
+				}
+			}
+			return new MatrixValue(mat);
+		} else {
+			if (!(v1 instanceof ScalarValue || v2 instanceof ScalarValue))
+				throw new WorkspaceInputException("Dimensions must be equal or a scalar must be used.");
+			Dimension dim = v1 instanceof ScalarValue ? v2.getDimension() : v1.getDimension();
+			RealMatrix mat = new Array2DRowRealMatrix(dim.getRows(), dim.getCols());
+			for (int i = 0; i < mat.getRowDimension(); i++) {
+				for (int j = 0; j < mat.getColumnDimension(); j++) {
+					double first = v1 instanceof ScalarValue ? v1.getValue(0) : v1.getValue(i, j);
+					double second = v2 instanceof ScalarValue ? v2.getValue(0) : v2.getValue(i, j);
+					mat.setEntry(i, j, Double.compare(first, 0.0d) != 0 || Double.compare(second, 0.0d) != 0 ? 1 : 0);
+				}
+			}
+			return new MatrixValue(mat);
+		}
+	}
+
+	public static boolean isInteger(ExpressionValue v1) {
+		for (int i = 0; i < v1.getMaxIndex(); i++) {
 			double value = v1.getValue(i);
-			if(!isInteger(value)) return false;
+			if (!isInteger(value))
+				return false;
 		}
 		return true;
 	}
-	
+
 	public static boolean isInteger(double input) {
 		return input == Math.floor(input);
 	}
@@ -452,7 +519,8 @@ public class MatOp {
 	}
 
 	/**
-	 * Returns true if the value is greater than or equal to the lower limit and less than or equal to the upper limit.
+	 * Returns true if the value is greater than or equal to the lower limit and
+	 * less than or equal to the upper limit.
 	 * 
 	 * @param value
 	 * @param lower
@@ -462,11 +530,12 @@ public class MatOp {
 	public static boolean inRange(double value, double lower, double upper) {
 		return value >= lower && value <= upper;
 	}
-	
-	public static boolean inRange(ExpressionValue v1, double lower, double upper){
-		for(int i = 0; i < v1.getMaxIndex(); i++){
+
+	public static boolean inRange(ExpressionValue v1, double lower, double upper) {
+		for (int i = 0; i < v1.getMaxIndex(); i++) {
 			double value = v1.getValue(i);
-			if(value < lower || value > upper) return false;
+			if (value < lower || value > upper)
+				return false;
 		}
 		return true;
 	}

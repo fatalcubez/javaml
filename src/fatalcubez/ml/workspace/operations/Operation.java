@@ -75,7 +75,7 @@ public enum Operation {
 	OR("|"){
 		@Override
 		public IOperation getOperationInstance() {
-			return null;
+			return new OrOperation();
 		}
 	};
 	
