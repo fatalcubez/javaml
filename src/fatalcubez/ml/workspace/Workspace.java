@@ -65,17 +65,19 @@ public class Workspace implements Runnable {
 			throw new WorkspaceInputException("Invalid parentheses placement (start/end).");
 
 		// Check to make sure all parenthesis are followed by valid characters
-//		String characters = ".^*+-=)\\]'";
-//		Pattern pattern = Pattern.compile("\\)[^" + characters + "]");
-//		Matcher matcher = pattern.matcher(input);
-//		if (matcher.find())
-//			throw new WorkspaceInputException("Invalid character placement after ')'.");
-//
-//		String characterPattern = "\\([^a-zA-Z0-9\\+\\-()\\[.:]";
-//		pattern = Pattern.compile(characterPattern);
-//		matcher = pattern.matcher(input);
-//		if (matcher.find())
-//			throw new WorkspaceInputException("Invalid character placement after '('.");
+		// String characters = ".^*+-=)\\]'";
+		// Pattern pattern = Pattern.compile("\\)[^" + characters + "]");
+		// Matcher matcher = pattern.matcher(input);
+		// if (matcher.find())
+		// throw new
+		// WorkspaceInputException("Invalid character placement after ')'.");
+		//
+		// String characterPattern = "\\([^a-zA-Z0-9\\+\\-()\\[.:]";
+		// pattern = Pattern.compile(characterPattern);
+		// matcher = pattern.matcher(input);
+		// if (matcher.find())
+		// throw new
+		// WorkspaceInputException("Invalid character placement after '('.");
 	}
 
 	private void checkBrackets(String input) throws WorkspaceInputException {
@@ -92,31 +94,39 @@ public class Workspace implements Runnable {
 			throw new WorkspaceInputException("Invalid bracket placement (start/end).");
 
 		// Check to make sure all brackets are followed by valid characters
-//		String characters = ".^*+-=)\\[\\],;'\\s";
-//		Pattern pattern = Pattern.compile("\\][^" + characters + "]");
-//		Matcher matcher = pattern.matcher(input);
-//		if (matcher.find())
-//			throw new WorkspaceInputException("Invalid character placement after ']'.");
-//
-//		String characterPattern = "\\[[^a-zA-Z0-9(\\[.]";
-//		pattern = Pattern.compile(characterPattern);
-//		matcher = pattern.matcher(input);
-//		if (matcher.find())
-//			throw new WorkspaceInputException("Invalid character placement after '['.");
+		// String characters = ".^*+-=)\\[\\],;'\\s";
+		// Pattern pattern = Pattern.compile("\\][^" + characters + "]");
+		// Matcher matcher = pattern.matcher(input);
+		// if (matcher.find())
+		// throw new
+		// WorkspaceInputException("Invalid character placement after ']'.");
+		//
+		// String characterPattern = "\\[[^a-zA-Z0-9(\\[.]";
+		// pattern = Pattern.compile(characterPattern);
+		// matcher = pattern.matcher(input);
+		// if (matcher.find())
+		// throw new
+		// WorkspaceInputException("Invalid character placement after '['.");
 	}
 
 	private void checkAssignment(String input) throws WorkspaceInputException {
 		if (!input.contains("="))
 			return;
-		if (input.split("=").length > 2)
-			throw new WorkspaceInputException("Too many assignment operators ('=').");
 		String[] sides = input.split("=");
+		if(sides.length == 0) throw new WorkspaceInputException("Invalid placement of '=' operator.");
 		String left = sides[0];
+		if(sides.length == 1 || left.isEmpty()) throw new WorkspaceInputException("Invalid use of '=' operator.");
 		String patternCharacters = "^[A-Za-z][A-Za-z0-9_]*$";
 		Pattern pattern = Pattern.compile(patternCharacters);
 		Matcher matcher = pattern.matcher(left);
-		if (!matcher.find())
-			throw new WorkspaceInputException("The expression to the left of the equals sign is not a valid target for an assignment.");
+		if (!matcher.find()) {
+			int index = input.indexOf('=');
+			if (index - 1 <= 0 && input.charAt(index + 1) != '=')
+				throw new WorkspaceInputException("Invalid use of equals sign.");
+			char c = input.charAt(index - 1);
+			if (!(c == '~' || c == '>' || c == '<' || c == '=') && input.charAt(index + 1) != '=')
+				throw new WorkspaceInputException("The expression to the left of the equals sign is not a valid target for an assignment.");
+		}
 		boolean isFunction = Function.getFunction(left) != null;
 		if (isFunction)
 			throw new WorkspaceInputException("Can't use function name in variable declaration.");
@@ -164,11 +174,25 @@ public class Workspace implements Runnable {
 		}
 
 		// First check to see if there is an assignment operator
+		boolean isAssignment = false;
 		if (input.indexOf('=') != -1) {
-			String[] sides = input.split("=");
-			String left = sides[0]; // left side is the variable name and must
-									// be saved
-			String right = sides[1]; // right side is going to be evaluated
+			int index = input.indexOf('=');
+			char c = input.charAt(index - 1);
+			if (!(c == '~' || c == '>' || c == '<' || c == '=') && input.charAt(index + 1) != '=')
+				isAssignment = true;
+		}
+		if (isAssignment) {
+			int index = input.indexOf('=');
+			String left = input.substring(0, index); // left side is the
+														// variable name and
+														// must
+			// be saved
+			String right = input.substring(index + 1, input.length()); // right
+																		// side
+																		// is
+																		// going
+																		// to be
+																		// evaluated
 			ExpressionValue value = simplify(right);
 			workspaceVariables.put(left, value);
 			ret = formatter.formatAssignment(left, value);
@@ -185,7 +209,7 @@ public class Workspace implements Runnable {
 			return new StringValue(input.substring(1, input.length() - 1));
 		}
 		int opening = 0;
-		
+
 		// Looking for | operator
 		for (int i = input.length() - 1; i >= 0; i--) {
 			char current = input.charAt(i);
@@ -214,7 +238,7 @@ public class Workspace implements Runnable {
 				return Operation.OR.getOperationInstance().evaluate(v1, simplify(input.substring(i + 1, input.length())), elementWise);
 			}
 		}
-		
+
 		opening = 0;
 
 		// Looking for & operator
@@ -245,12 +269,71 @@ public class Workspace implements Runnable {
 				return Operation.AND.getOperationInstance().evaluate(v1, simplify(input.substring(i + 1, input.length())), elementWise);
 			}
 		}
-		
+
 		// Looking for ==, ~=, >, >=, <, <= operators
-		
-		
+		for (int i = input.length() - 1; i >= 0; i--) {
+			char current = input.charAt(i);
+			if (current == '(' || current == '[') {
+				opening++;
+				continue;
+			}
+			if (current == ')' || current == ']') {
+				opening--;
+				continue;
+			}
+			if ((current == '<' || current == '>') && opening == 0) {
+				boolean elementWise = false;
+				if (i == input.length() - 1)
+					throw new WorkspaceInputException("Operation missing second term.");
+				if (i - 1 == 0 && input.charAt(i - 1) == '.')
+					throw new WorkspaceInputException("Invalid use of dot operator.");
+				if (i - 1 > 0 && input.charAt(i - 1) == '.')
+					elementWise = true;
+				ExpressionValue v1 = null;
+				if (i == 0) {
+					throw new WorkspaceInputException("Invalid operation placement.");
+				} else {
+					v1 = elementWise ? simplify(input.substring(0, i - 1)) : simplify(input.substring(0, i));
+				}
+				if (current == '>') {
+					return Operation.GREATER_THAN.getOperationInstance().evaluate(v1, simplify(input.substring(i + 1, input.length())), elementWise);
+				} else {
+					return Operation.LESS_THAN.getOperationInstance().evaluate(v1, simplify(input.substring(i + 1, input.length())), elementWise);
+				}
+			} else if (current == '=' && opening == 0) {
+				boolean elementWise = false;
+				if (i == input.length() - 1)
+					throw new WorkspaceInputException("Operation missing second term.");
+				if (i - 1 <= 0)
+					throw new WorkspaceInputException("Invalid operation placement.");
+				i--;
+				if (i - 1 == 0 && input.charAt(i - 1) == '.')
+					throw new WorkspaceInputException("Invalid use of dot operator.");
+				if (i - 1 > 0 && input.charAt(i - 1) == '.')
+					elementWise = true;
+				ExpressionValue v1 = null;
+				if (i == 0) {
+					throw new WorkspaceInputException("Invalid operation placement.");
+				} else {
+					v1 = elementWise ? simplify(input.substring(0, i - 1)) : simplify(input.substring(0, i));
+				}
+				current = input.charAt(i);
+				if (current == '=') {
+					return Operation.EQUAL.getOperationInstance().evaluate(v1, simplify(input.substring(i + 2, input.length())), elementWise);
+				} else if (current == '~') {
+					return Operation.NOT_EQUAL.getOperationInstance().evaluate(v1, simplify(input.substring(i + 2, input.length())), elementWise);
+				} else if (current == '<') {
+					return Operation.LESS_THAN_EQUAL.getOperationInstance().evaluate(v1, simplify(input.substring(i + 2, input.length())), elementWise);
+				} else if (current == '>') {
+					return Operation.GREATER_THAN_EQUAL.getOperationInstance().evaluate(v1, simplify(input.substring(i + 2, input.length())), elementWise);
+				} else {
+					throw new WorkspaceInputException("Invalid operation character '" + current + "'.");
+				}
+			}
+		}
+
 		opening = 0;
-		
+
 		// Looking for :
 		List<ExpressionValue> list = new ArrayList<ExpressionValue>();
 		int begin = 0;
@@ -391,9 +474,9 @@ public class Workspace implements Runnable {
 				return Operation.POWER.getOperationInstance().evaluate(v1, simplify(input.substring(i + 1, input.length())), elementWise);
 			}
 		}
-		
+
 		// Negate
-		if(input.charAt(0) == '~'){
+		if (input.charAt(0) == '~') {
 			if (input.length() == 1)
 				throw new WorkspaceInputException("Invalid use of negate operation.");
 			return MatOp.negate(simplify(input.substring(1)));
@@ -700,7 +783,7 @@ public class Workspace implements Runnable {
 		}
 		List<Object> ret = new ArrayList<Object>();
 		ret.add(statements.toArray(new String[0]));
-		ret.add(displayList.toArray(new Boolean[0]));		
+		ret.add(displayList.toArray(new Boolean[0]));
 		return ret;
 	}
 

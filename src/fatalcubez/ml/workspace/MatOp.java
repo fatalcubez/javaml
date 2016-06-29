@@ -523,7 +523,146 @@ public class MatOp {
 			return new MatrixValue(mat);
 		}
 	}
+	
+	public static ExpressionValue equal(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException{
+		if (v1.getDimension().equals(v2.getDimension())) {
+			if (v1 instanceof ScalarValue)
+				return Double.compare(v1.getValue(0), v2.getValue(0)) == 0 ? new ScalarValue(1.0d) : new ScalarValue(0.0d);
+			RealMatrix mat = new Array2DRowRealMatrix(v1.getDimension().getRows(), v1.getDimension().getCols());
+			for (int i = 0; i < mat.getRowDimension(); i++) {
+				for (int j = 0; j < mat.getColumnDimension(); j++) {
+					mat.setEntry(i, j, Double.compare(v1.getValue(i, j), v2.getValue(i, j)) == 0 ? 1 : 0);
+				}
+			}
+			return new MatrixValue(mat);
+		} else {
+			if (!(v1 instanceof ScalarValue || v2 instanceof ScalarValue))
+				throw new WorkspaceInputException("Dimensions must be equal or a scalar must be used.");
+			Dimension dim = v1 instanceof ScalarValue ? v2.getDimension() : v1.getDimension();
+			RealMatrix mat = new Array2DRowRealMatrix(dim.getRows(), dim.getCols());
+			for (int i = 0; i < mat.getRowDimension(); i++) {
+				for (int j = 0; j < mat.getColumnDimension(); j++) {
+					double first = v1 instanceof ScalarValue ? v1.getValue(0) : v1.getValue(i, j);
+					double second = v2 instanceof ScalarValue ? v2.getValue(0) : v2.getValue(i, j);
+					mat.setEntry(i, j, Double.compare(first, second) == 0 ? 1 : 0);
+				}
+			}
+			return new MatrixValue(mat);
+		}
+	}
+	
+	public static ExpressionValue notEqual(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException {
+		return MatOp.negate(MatOp.equal(v1, v2));
+	}
+	
+	public static ExpressionValue greaterThan(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException{
+		if (v1.getDimension().equals(v2.getDimension())) {
+			if (v1 instanceof ScalarValue)
+				return Double.compare(v1.getValue(0), v2.getValue(0)) > 0 ? new ScalarValue(1.0d) : new ScalarValue(0.0d);
+			RealMatrix mat = new Array2DRowRealMatrix(v1.getDimension().getRows(), v1.getDimension().getCols());
+			for (int i = 0; i < mat.getRowDimension(); i++) {
+				for (int j = 0; j < mat.getColumnDimension(); j++) {
+					mat.setEntry(i, j, Double.compare(v1.getValue(i, j), v2.getValue(i, j)) > 0 ? 1 : 0);
+				}
+			}
+			return new MatrixValue(mat);
+		} else {
+			if (!(v1 instanceof ScalarValue || v2 instanceof ScalarValue))
+				throw new WorkspaceInputException("Dimensions must be equal or a scalar must be used.");
+			Dimension dim = v1 instanceof ScalarValue ? v2.getDimension() : v1.getDimension();
+			RealMatrix mat = new Array2DRowRealMatrix(dim.getRows(), dim.getCols());
+			for (int i = 0; i < mat.getRowDimension(); i++) {
+				for (int j = 0; j < mat.getColumnDimension(); j++) {
+					double first = v1 instanceof ScalarValue ? v1.getValue(0) : v1.getValue(i, j);
+					double second = v2 instanceof ScalarValue ? v2.getValue(0) : v2.getValue(i, j);
+					mat.setEntry(i, j, Double.compare(first, second) > 0 ? 1 : 0);
+				}
+			}
+			return new MatrixValue(mat);
+		}
+	}
+	
+	public static ExpressionValue greaterThanEqual(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException{
+		if (v1.getDimension().equals(v2.getDimension())) {
+			if (v1 instanceof ScalarValue)
+				return Double.compare(v1.getValue(0), v2.getValue(0)) >= 0 ? new ScalarValue(1.0d) : new ScalarValue(0.0d);
+			RealMatrix mat = new Array2DRowRealMatrix(v1.getDimension().getRows(), v1.getDimension().getCols());
+			for (int i = 0; i < mat.getRowDimension(); i++) {
+				for (int j = 0; j < mat.getColumnDimension(); j++) {
+					mat.setEntry(i, j, Double.compare(v1.getValue(i, j), v2.getValue(i, j)) >= 0 ? 1 : 0);
+				}
+			}
+			return new MatrixValue(mat);
+		} else {
+			if (!(v1 instanceof ScalarValue || v2 instanceof ScalarValue))
+				throw new WorkspaceInputException("Dimensions must be equal or a scalar must be used.");
+			Dimension dim = v1 instanceof ScalarValue ? v2.getDimension() : v1.getDimension();
+			RealMatrix mat = new Array2DRowRealMatrix(dim.getRows(), dim.getCols());
+			for (int i = 0; i < mat.getRowDimension(); i++) {
+				for (int j = 0; j < mat.getColumnDimension(); j++) {
+					double first = v1 instanceof ScalarValue ? v1.getValue(0) : v1.getValue(i, j);
+					double second = v2 instanceof ScalarValue ? v2.getValue(0) : v2.getValue(i, j);
+					mat.setEntry(i, j, Double.compare(first, second) >= 0 ? 1 : 0);
+				}
+			}
+			return new MatrixValue(mat);
+		}
+	}
+	
+	public static ExpressionValue lessThan(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException{
+		if (v1.getDimension().equals(v2.getDimension())) {
+			if (v1 instanceof ScalarValue)
+				return Double.compare(v1.getValue(0), v2.getValue(0)) < 0 ? new ScalarValue(1.0d) : new ScalarValue(0.0d);
+			RealMatrix mat = new Array2DRowRealMatrix(v1.getDimension().getRows(), v1.getDimension().getCols());
+			for (int i = 0; i < mat.getRowDimension(); i++) {
+				for (int j = 0; j < mat.getColumnDimension(); j++) {
+					mat.setEntry(i, j, Double.compare(v1.getValue(i, j), v2.getValue(i, j)) < 0 ? 1 : 0);
+				}
+			}
+			return new MatrixValue(mat);
+		} else {
+			if (!(v1 instanceof ScalarValue || v2 instanceof ScalarValue))
+				throw new WorkspaceInputException("Dimensions must be equal or a scalar must be used.");
+			Dimension dim = v1 instanceof ScalarValue ? v2.getDimension() : v1.getDimension();
+			RealMatrix mat = new Array2DRowRealMatrix(dim.getRows(), dim.getCols());
+			for (int i = 0; i < mat.getRowDimension(); i++) {
+				for (int j = 0; j < mat.getColumnDimension(); j++) {
+					double first = v1 instanceof ScalarValue ? v1.getValue(0) : v1.getValue(i, j);
+					double second = v2 instanceof ScalarValue ? v2.getValue(0) : v2.getValue(i, j);
+					mat.setEntry(i, j, Double.compare(first, second) < 0 ? 1 : 0);
+				}
+			}
+			return new MatrixValue(mat);
+		}
+	}
 
+	public static ExpressionValue lessThanEqual(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException{
+		if (v1.getDimension().equals(v2.getDimension())) {
+			if (v1 instanceof ScalarValue)
+				return Double.compare(v1.getValue(0), v2.getValue(0)) <= 0 ? new ScalarValue(1.0d) : new ScalarValue(0.0d);
+			RealMatrix mat = new Array2DRowRealMatrix(v1.getDimension().getRows(), v1.getDimension().getCols());
+			for (int i = 0; i < mat.getRowDimension(); i++) {
+				for (int j = 0; j < mat.getColumnDimension(); j++) {
+					mat.setEntry(i, j, Double.compare(v1.getValue(i, j), v2.getValue(i, j)) <= 0 ? 1 : 0);
+				}
+			}
+			return new MatrixValue(mat);
+		} else {
+			if (!(v1 instanceof ScalarValue || v2 instanceof ScalarValue))
+				throw new WorkspaceInputException("Dimensions must be equal or a scalar must be used.");
+			Dimension dim = v1 instanceof ScalarValue ? v2.getDimension() : v1.getDimension();
+			RealMatrix mat = new Array2DRowRealMatrix(dim.getRows(), dim.getCols());
+			for (int i = 0; i < mat.getRowDimension(); i++) {
+				for (int j = 0; j < mat.getColumnDimension(); j++) {
+					double first = v1 instanceof ScalarValue ? v1.getValue(0) : v1.getValue(i, j);
+					double second = v2 instanceof ScalarValue ? v2.getValue(0) : v2.getValue(i, j);
+					mat.setEntry(i, j, Double.compare(first, second) <= 0 ? 1 : 0);
+				}
+			}
+			return new MatrixValue(mat);
+		}
+	}
+	
 	public static boolean isInteger(ExpressionValue v1) {
 		for (int i = 0; i < v1.getMaxIndex(); i++) {
 			double value = v1.getValue(i);

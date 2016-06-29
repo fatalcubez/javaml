@@ -36,34 +36,34 @@ public enum Operation {
 	EQUAL("=="){
 		@Override
 		public IOperation getOperationInstance() {
-			return null;
+			return new EqualOperation();
 		}
 	},
 	NOT_EQUAL("~="){
 		@Override
 		public IOperation getOperationInstance() {
-			return null;
+			return new NotEqualOperation();
 		}
 	},
 	GREATER_THAN(">"){
 		@Override
 		public IOperation getOperationInstance() {
-			return null;
+			return new GreaterThanOperation();
 		}
 	},GREATER_THAN_EQUAL(">="){
 		@Override
 		public IOperation getOperationInstance() {
-			return null;
+			return new GreaterThanEqualOperation();
 		}
 	},LESS_THAN("<"){
 		@Override
 		public IOperation getOperationInstance() {
-			return null;
+			return new LessThanOperation();
 		}
 	},LESS_THAN_EQUAL("<="){
 		@Override
 		public IOperation getOperationInstance() {
-			return null;
+			return new LessThanEqualOperation();
 		}
 	},
 	AND("&"){
