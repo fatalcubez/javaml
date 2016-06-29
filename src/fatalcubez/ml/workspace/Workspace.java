@@ -215,7 +215,36 @@ public class Workspace implements Runnable {
 			}
 		}
 		
+		opening = 0;
+
 		// Looking for & operator
+		for (int i = input.length() - 1; i >= 0; i--) {
+			char current = input.charAt(i);
+			if (current == '(' || current == '[') {
+				opening++;
+				continue;
+			}
+			if (current == ')' || current == ']') {
+				opening--;
+				continue;
+			}
+			if (current == '&' && opening == 0) {
+				boolean elementWise = false;
+				if (i == input.length() - 1)
+					throw new WorkspaceInputException("Operation missing second term.");
+				if (i - 1 == 0 && input.charAt(i - 1) == '.')
+					throw new WorkspaceInputException("Invalid use of dot operator.");
+				if (i - 1 > 0 && input.charAt(i - 1) == '.')
+					elementWise = true;
+				ExpressionValue v1 = null;
+				if (i == 0) {
+					throw new WorkspaceInputException("Invalid operation placement.");
+				} else {
+					v1 = elementWise ? simplify(input.substring(0, i - 1)) : simplify(input.substring(0, i));
+				}
+				return Operation.AND.getOperationInstance().evaluate(v1, simplify(input.substring(i + 1, input.length())), elementWise);
+			}
+		}
 		
 		// Looking for ==, ~=, >, >=, <, <= operators
 		

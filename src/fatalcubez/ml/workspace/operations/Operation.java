@@ -69,7 +69,7 @@ public enum Operation {
 	AND("&"){
 		@Override
 		public IOperation getOperationInstance() {
-			return null;
+			return new AndOperation();
 		}
 	},
 	OR("|"){
