@@ -112,24 +112,21 @@ public class Workspace implements Runnable {
 	private void checkAssignment(String input) throws WorkspaceInputException {
 		if (!input.contains("="))
 			return;
-		String[] sides = input.split("=");
-		if(sides.length == 0) throw new WorkspaceInputException("Invalid placement of '=' operator.");
-		String left = sides[0];
-		if(sides.length == 1 || left.isEmpty()) throw new WorkspaceInputException("Invalid use of '=' operator.");
-		String patternCharacters = "^[A-Za-z][A-Za-z0-9_]*$";
+		String patternCharacters = "(?<![<>~=])=(?!=)";
 		Pattern pattern = Pattern.compile(patternCharacters);
-		Matcher matcher = pattern.matcher(left);
-		if (!matcher.find()) {
-			int index = input.indexOf('=');
-			if (index - 1 <= 0 && input.charAt(index + 1) != '=')
-				throw new WorkspaceInputException("Invalid use of equals sign.");
-			char c = input.charAt(index - 1);
-			if (!(c == '~' || c == '>' || c == '<' || c == '=') && input.charAt(index + 1) != '=')
-				throw new WorkspaceInputException("The expression to the left of the equals sign is not a valid target for an assignment.");
+		Matcher matcher = pattern.matcher(input);
+		if(matcher.find()){
+			String left = input.substring(0, matcher.start());
+			if(left.isEmpty()) throw new WorkspaceInputException("Invalid statement preceding assignment operator.");
+			if(matcher.start() + 1 == input.length()) throw new WorkspaceInputException("Invalid statement following assignment operator.");
+			patternCharacters = "^[A-Za-z][A-Za-z0-9_]*$";
+			pattern = Pattern.compile(patternCharacters);
+			matcher = pattern.matcher(left);
+			if (!matcher.find()) throw new WorkspaceInputException("The expression to the left of the equals sign is not a valid target for an assignment.");
+			boolean isFunction = Function.getFunction(left) != null;
+			if (isFunction)
+				throw new WorkspaceInputException("Can't use function name in variable declaration.");
 		}
-		boolean isFunction = Function.getFunction(left) != null;
-		if (isFunction)
-			throw new WorkspaceInputException("Can't use function name in variable declaration.");
 	}
 
 	private void checkStatement(String input) throws WorkspaceInputException {
@@ -174,25 +171,13 @@ public class Workspace implements Runnable {
 		}
 
 		// First check to see if there is an assignment operator
-		boolean isAssignment = false;
-		if (input.indexOf('=') != -1) {
-			int index = input.indexOf('=');
-			char c = input.charAt(index - 1);
-			if (!(c == '~' || c == '>' || c == '<' || c == '=') && input.charAt(index + 1) != '=')
-				isAssignment = true;
-		}
-		if (isAssignment) {
-			int index = input.indexOf('=');
-			String left = input.substring(0, index); // left side is the
-														// variable name and
-														// must
-			// be saved
-			String right = input.substring(index + 1, input.length()); // right
-																		// side
-																		// is
-																		// going
-																		// to be
-																		// evaluated
+		String patternCharacters = "(?<![<>~=])=(?!=)";
+		Pattern pattern = Pattern.compile(patternCharacters);
+		Matcher matcher = pattern.matcher(input);
+		if (matcher.find()) {
+			int index = matcher.start();
+			String left = input.substring(0, index); 
+			String right = input.substring(index + 1, input.length()); 
 			ExpressionValue value = simplify(right);
 			workspaceVariables.put(left, value);
 			ret = formatter.formatAssignment(left, value);

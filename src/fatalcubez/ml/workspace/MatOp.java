@@ -7,6 +7,13 @@ import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
+import fatalcubez.ml.workspace.Dimension;
+import fatalcubez.ml.workspace.ExpressionValue;
+import fatalcubez.ml.workspace.MatrixValue;
+import fatalcubez.ml.workspace.ScalarValue;
+import fatalcubez.ml.workspace.StringValue;
+import fatalcubez.ml.workspace.WorkspaceInputException;
+
 public class MatOp {
 
 	public static ExpressionValue multiply(ExpressionValue v1, ExpressionValue v2) throws WorkspaceInputException {
