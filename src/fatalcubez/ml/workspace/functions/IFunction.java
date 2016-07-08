@@ -7,6 +7,6 @@ import fatalcubez.ml.workspace.WorkspaceInputException;
 
 public interface IFunction {
 
-	public ExpressionValue evaluate(List<ExpressionValue> params) throws WorkspaceInputException;
+	public List<ExpressionValue> evaluate(List<ExpressionValue> params, int numOutputs) throws WorkspaceInputException;
 	
 }

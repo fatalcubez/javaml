@@ -7,12 +7,7 @@ import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
-import fatalcubez.ml.workspace.Dimension;
-import fatalcubez.ml.workspace.ExpressionValue;
-import fatalcubez.ml.workspace.MatrixValue;
-import fatalcubez.ml.workspace.ScalarValue;
-import fatalcubez.ml.workspace.StringValue;
-import fatalcubez.ml.workspace.WorkspaceInputException;
+import fatalcubez.ml.workspace.functions.Function;
 
 public class MatOp {
 
@@ -460,6 +455,24 @@ public class MatOp {
 
 	public static MatrixValue getOnesMatrix(ScalarValue v1, ScalarValue v2) throws WorkspaceInputException {
 		return (MatrixValue) add(getZerosMatrix(v1, v2), new ScalarValue(1.0d));
+	}
+	
+	public static MatrixValue getSize(ExpressionValue v1){
+		RealMatrix mat = new Array2DRowRealMatrix(1, 2);
+		mat.setEntry(0, 0, v1.getDimension().getRows());
+		mat.setEntry(0, 1, v1.getDimension().getCols());
+		return new MatrixValue(mat);
+	}
+	
+	public static List<ExpressionValue> getSize(ExpressionValue v1, int numOutputs) throws  WorkspaceInputException{
+		if(numOutputs > Function.SIZE.getMaxOutputs()) throw new WorkspaceInputException("Too many output arguments for function 'size'");
+		List<ExpressionValue> ret = new ArrayList<ExpressionValue>();
+		if(numOutputs == 1){
+			ret.add(getSize(v1));
+		}
+		ret.add(new ScalarValue(v1.getDimension().getRows()));
+		ret.add(new ScalarValue(v1.getDimension().getCols()));
+		return ret;
 	}
 
 	/*

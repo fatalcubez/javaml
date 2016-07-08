@@ -8,11 +8,21 @@ public enum Function {
 		public IFunction getFunctionInstance() {
 			return new EyeFunction();
 		}
+
+		@Override
+		public int getMaxOutputs() {
+			return 1;
+		}
 	},
 	ZEROS("zeros") {
 		@Override
 		public IFunction getFunctionInstance() {
 			return new ZerosFunction();
+		}
+
+		@Override
+		public int getMaxOutputs() {
+			return 1;
 		}
 	},
 	ONES("ones"){
@@ -20,17 +30,43 @@ public enum Function {
 		public IFunction getFunctionInstance() {
 			return new OnesFunction();
 		}
+
+		@Override
+		public int getMaxOutputs() {
+			return 1;
+		}
 	},
 	SUM("sum"){
 		@Override
 		public IFunction getFunctionInstance() {
 			return new SumFunction();
 		}
+
+		@Override
+		public int getMaxOutputs() {
+			return 1;
+		}
 	},
 	MEAN("mean"){
 		@Override
 		public IFunction getFunctionInstance() {
 			return new MeanFunction();
+		}
+
+		@Override
+		public int getMaxOutputs() {
+			return 1;
+		}
+	},
+	SIZE("size"){
+		@Override
+		public IFunction getFunctionInstance() {
+			return new SizeFunction();
+		}
+
+		@Override
+		public int getMaxOutputs() {
+			return 2;
 		}
 	};
 	
@@ -52,5 +88,6 @@ public enum Function {
 	}
 	
 	public abstract IFunction getFunctionInstance();
+	public abstract int getMaxOutputs();
 
 }

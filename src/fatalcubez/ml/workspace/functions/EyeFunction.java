@@ -1,5 +1,6 @@
 package fatalcubez.ml.workspace.functions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import fatalcubez.ml.workspace.ExpressionValue;
@@ -10,16 +11,20 @@ import fatalcubez.ml.workspace.WorkspaceInputException;
 public class EyeFunction implements IFunction{
 
 	@Override
-	public ExpressionValue evaluate(List<ExpressionValue> params) throws WorkspaceInputException{
+	public List<ExpressionValue> evaluate(List<ExpressionValue> params, int numOutputs) throws WorkspaceInputException{
+		if(numOutputs > Function.EYE.getMaxOutputs()) throw new WorkspaceInputException("Too many outputs for function 'eye'.");
 		if(params.size() > 2) throw new WorkspaceInputException("Invalid number of inputs for function.");
 		for(ExpressionValue v : params){
 			if(!(v instanceof ScalarValue))throw new WorkspaceInputException("Input values must be scalars.");
 		}
+		List<ExpressionValue> ret = new ArrayList<ExpressionValue>();
 		if(params.size() == 1){
-			return MatOp.getEyeMatrix((ScalarValue)params.get(0));
+			ret.add(MatOp.getEyeMatrix((ScalarValue)params.get(0)));
+			return ret;
 		}
 		else{
-			return MatOp.getEyeMatrix((ScalarValue)params.get(0), (ScalarValue)params.get(1));
+			ret.add(MatOp.getEyeMatrix((ScalarValue)params.get(0), (ScalarValue)params.get(1)));
+			return ret;
 		}
 	}
 
