@@ -183,6 +183,7 @@ public class Workspace implements Runnable {
 				}
 			}
 			else{
+				left = left.replace("[", "").replace("]", "");
 				ExpressionValue value = simplify(right);
 				workspaceVariables.put(left, value);
 				ret = formatter.formatAssignment(left, value);
