@@ -245,7 +245,7 @@ public class Workspace implements Runnable {
 	}
 
 	private ExpressionValue simplify(String input) throws WorkspaceInputException {
-		if ((input.charAt(0) == '\'' || input.charAt(0) == '"') && (input.charAt(input.length() - 1) == '\'' || input.charAt(input.length() - 1) == '"')) {
+		if ((input.charAt(0) == '\'' || input.charAt(0) == '"') && (input.charAt(input.length() - 1) == '\'' || input.charAt(input.length() - 1) == '"') && input.length() > 1) {
 			return new StringValue(input.substring(1, input.length() - 1));
 		}
 		if (input.charAt(0) == '(' && input.charAt(input.length() - 1) == ')') {
