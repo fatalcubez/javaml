@@ -11,6 +11,13 @@ import java.util.regex.Pattern;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
+import fatalcubez.ml.workspace.ExpressionValue;
+import fatalcubez.ml.workspace.MatOp;
+import fatalcubez.ml.workspace.MatrixValue;
+import fatalcubez.ml.workspace.ScalarValue;
+import fatalcubez.ml.workspace.StringValue;
+import fatalcubez.ml.workspace.WorkspaceFormatter;
+import fatalcubez.ml.workspace.WorkspaceInputException;
 import fatalcubez.ml.workspace.functions.Function;
 import fatalcubez.ml.workspace.functions.IFunction;
 import fatalcubez.ml.workspace.operations.IOperation;
@@ -111,7 +118,7 @@ public class Workspace implements Runnable {
 			String left = input.substring(0, matcher.start()).replace(" ", "");
 			if (left.isEmpty()) throw new WorkspaceInputException("Invalid statement preceding assignment operator.");
 			if (matcher.start() + 1 == input.length()) throw new WorkspaceInputException("Invalid statement following assignment operator.");
-			patternCharacters = "^\\[[A-Za-z]\\w*(?:,[A-Za-z]\\w*)*\\]$";
+			patternCharacters = "^\\[[A-Za-z]\\w*(?:,[A-Za-z]\\w*)*\\]$|^[A-Za-z]\\w*$";
 			pattern = Pattern.compile(patternCharacters);
 			matcher = pattern.matcher(left);
 			if (!matcher.find()) throw new WorkspaceInputException("The expression to the left of the equals sign is not a valid target for an assignment.");
