@@ -68,6 +68,39 @@ public enum Function {
 		public int getMaxOutputs() {
 			return 2;
 		}
+	},
+	SIN("sin"){
+		@Override
+		public IFunction getFunctionInstance() {
+			return new SinFunction();
+		}
+
+		@Override
+		public int getMaxOutputs() {
+			return 1;
+		}
+	},
+	COS("cos"){
+		@Override
+		public IFunction getFunctionInstance() {
+			return new CosFunction();
+		}
+
+		@Override
+		public int getMaxOutputs() {
+			return 1;
+		}
+	},
+	TAN("tan"){
+		@Override
+		public IFunction getFunctionInstance() {
+			return new TanFunction();
+		}
+
+		@Override
+		public int getMaxOutputs() {
+			return 1;
+		}
 	};
 	
 	private String consoleName;

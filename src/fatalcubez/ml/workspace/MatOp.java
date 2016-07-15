@@ -683,6 +683,42 @@ public class MatOp {
 		}
 	}
 	
+	public static ExpressionValue sin(ExpressionValue v1) throws WorkspaceInputException{
+		return mathFunc(v1, Function.SIN);
+	}
+	
+	public static ExpressionValue cos(ExpressionValue v1) throws WorkspaceInputException{
+		return mathFunc(v1, Function.COS);
+	}
+	
+	public static ExpressionValue tan(ExpressionValue v1) throws WorkspaceInputException{
+		return mathFunc(v1, Function.TAN);
+	}
+	
+	private static ExpressionValue mathFunc(ExpressionValue v1, Function f) throws WorkspaceInputException{
+		RealMatrix mat = new Array2DRowRealMatrix(v1.getDimension().getRows(), v1.getDimension().getCols());
+		for(int i = 0; i < mat.getRowDimension(); i++){
+			for(int j = 0; j < mat.getColumnDimension(); j++){
+				double num = v1.getValue(i, j);
+				if(f.equals(Function.SIN)){
+					num = Math.sin(num);
+				}
+				else if(f.equals(Function.COS)){
+					num = Math.cos(num);
+				}
+				else if(f.equals(Function.TAN)){
+					num = Math.tan(num);
+				}
+				else{
+					throw new WorkspaceInputException("Invalid math function.");
+				}
+				mat.setEntry(i, j, num);
+			}
+		}
+		if(v1.getMaxIndex() == 1) return new ScalarValue(mat.getEntry(0, 0));
+		return new MatrixValue(mat);
+	}
+	
 	public static boolean isInteger(ExpressionValue v1) {
 		for (int i = 0; i < v1.getMaxIndex(); i++) {
 			double value = v1.getValue(i);

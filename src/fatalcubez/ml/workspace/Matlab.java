@@ -169,9 +169,6 @@ public class Matlab {
 		if ((input.charAt(0) == '\'' || input.charAt(0) == '"') && (input.charAt(input.length() - 1) == '\'' || input.charAt(input.length() - 1) == '"') && input.length() > 1) {
 			return new StringValue(input.substring(1, input.length() - 1));
 		}
-		if (input.charAt(0) == '(' && input.charAt(input.length() - 1) == ')') {
-			return simplify(input.substring(1, input.length() - 1));
-		}
 
 		int opening = 0;
 
@@ -426,6 +423,10 @@ public class Matlab {
 			if (input.length() == 1) throw new WorkspaceInputException("Invalid use of transpose operation.");
 			return MatOp.transpose(input.charAt(input.length() - 2) == '.' ? simplify(input.substring(0, input.length() - 2)) : simplify(input.substring(0, input.length() - 1)));
 		}
+		
+		if (input.charAt(0) == '(' && input.charAt(input.length() - 1) == ')') {
+			return simplify(input.substring(1, input.length() - 1));
+		}
 
 		// Check for function or indexing
 		String characters = "^[A-Za-z]\\w*\\(.*\\)$";
@@ -678,6 +679,13 @@ public class Matlab {
 		return statements;
 	}
 	
+	/**
+	 * Evaluates a Matlab expression given through a String argument.
+	 * Updates variables HashMap with the parsed data.
+	 *
+	 * @param input
+	 * @throws WorkspaceInputException
+	 */
 	public void evaluate(String input) throws WorkspaceInputException{
 		List<String> statements = getStatements(input);
 		for(String statement : statements){
@@ -718,6 +726,4 @@ public class Matlab {
 	public HashMap<String, ExpressionValue> getVariables(){
 		return variables;
 	}
-	
-	
 }

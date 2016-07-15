@@ -2,27 +2,10 @@ package fatalcubez.ml.workspace;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.math3.linear.MatrixUtils;
-import org.apache.commons.math3.linear.RealMatrix;
-
-import fatalcubez.ml.workspace.ExpressionValue;
-import fatalcubez.ml.workspace.MatOp;
-import fatalcubez.ml.workspace.MatrixValue;
-import fatalcubez.ml.workspace.ScalarValue;
-import fatalcubez.ml.workspace.StringValue;
-import fatalcubez.ml.workspace.WorkspaceFormatter;
-import fatalcubez.ml.workspace.WorkspaceInputException;
-import fatalcubez.ml.workspace.functions.Function;
-import fatalcubez.ml.workspace.functions.IFunction;
-import fatalcubez.ml.workspace.operations.IOperation;
-import fatalcubez.ml.workspace.operations.Operation;
 
 public class Workspace implements Runnable {
 
@@ -141,7 +124,7 @@ public class Workspace implements Runnable {
 							if(numOutputs > 1){
 								String[] vars = left.substring(1, left.length() - 1).split(",");
 								for(int j = 0; j < vars.length; j++){
-									String name = vars[i];
+									String name = vars[j];
 									finalOutput = finalOutput + formatter.formatAssignment(name, mLab.getVariables().get(name));
 								}
 							}
