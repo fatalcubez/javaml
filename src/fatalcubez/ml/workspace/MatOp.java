@@ -695,6 +695,14 @@ public class MatOp {
 		return mathFunc(v1, Function.TAN);
 	}
 	
+	public static ExpressionValue exp(ExpressionValue v1) throws WorkspaceInputException {
+		return mathFunc(v1, Function.EXP);
+	}
+	
+	public static ExpressionValue log(ExpressionValue v1) throws WorkspaceInputException {
+		return mathFunc(v1, Function.LOG);
+	}
+	
 	private static ExpressionValue mathFunc(ExpressionValue v1, Function f) throws WorkspaceInputException{
 		RealMatrix mat = new Array2DRowRealMatrix(v1.getDimension().getRows(), v1.getDimension().getCols());
 		for(int i = 0; i < mat.getRowDimension(); i++){
@@ -708,6 +716,12 @@ public class MatOp {
 				}
 				else if(f.equals(Function.TAN)){
 					num = Math.tan(num);
+				}
+				else if(f.equals(Function.EXP)){
+					num = Math.pow(Math.E, num);
+				}
+				else if(f.equals(Function.LOG)){
+					num = Math.log(num);
 				}
 				else{
 					throw new WorkspaceInputException("Invalid math function.");

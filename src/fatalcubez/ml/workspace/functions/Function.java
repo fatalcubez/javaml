@@ -101,6 +101,28 @@ public enum Function {
 		public int getMaxOutputs() {
 			return 1;
 		}
+	},
+	EXP("exp"){
+		@Override
+		public IFunction getFunctionInstance() {
+			return new ExpFunction();
+		}
+
+		@Override
+		public int getMaxOutputs() {
+			return 1;
+		}
+	},
+	LOG("log"){
+		@Override
+		public IFunction getFunctionInstance() {
+			return new LogFunction();
+		}
+
+		@Override
+		public int getMaxOutputs() {
+			return 1;
+		}
 	};
 	
 	private String consoleName;
