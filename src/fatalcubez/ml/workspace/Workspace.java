@@ -116,10 +116,10 @@ public class Workspace implements Runnable {
 						String finalOutput = "";
 						String patternCharacters = "(?<![<>~=])=(?!=)";
 						Pattern pattern = Pattern.compile(patternCharacters);
-						Matcher matcher = pattern.matcher(input);
+						Matcher matcher = pattern.matcher(statements[i]);
 						if (matcher.find()) {
 							int index = matcher.start();
-							String left = input.substring(0, index);
+							String left = statements[i].substring(0, index);
 							int numOutputs = left.length() - left.replace(",", "").length() + 1;
 							if(numOutputs > 1){
 								String[] vars = left.substring(1, left.length() - 1).split(",");

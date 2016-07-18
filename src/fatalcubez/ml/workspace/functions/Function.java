@@ -123,6 +123,17 @@ public enum Function {
 		public int getMaxOutputs() {
 			return 1;
 		}
+	},
+	ABS("abs"){
+		@Override
+		public IFunction getFunctionInstance() {
+			return new AbsFunction();
+		}
+
+		@Override
+		public int getMaxOutputs() {
+			return 1;
+		}
 	};
 	
 	private String consoleName;

@@ -37,4 +37,11 @@ public final class ScalarValue implements ExpressionValue {
 		if(row > 0 || col > 0) throw new IllegalArgumentException("Index out of range.");
 		return scalar;
 	}
+	
+	@Override
+	public String toString(){
+		return String.format((scalar == Math.floor(scalar) ? "%.0f" : "%.4f"), scalar);
+	}
+	
 }
+
